@@ -135,12 +135,18 @@ export default class MainPlot{
 
     }
 
-
+    /**
+     *
+     * @returns {*|[*]|[]|*[]}
+     */
     makeGridLinesX() {
         return d3.axisBottom(this.xScale).ticks(this.ticksCount);
     }
 
-
+    /**
+     *
+     * @returns {*|[*]|[]|*[]}
+     */
     makeGridlinesY() {
         return d3.axisLeft(this.yScale)
             .ticks(this.ticksCount)
