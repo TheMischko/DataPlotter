@@ -1,3 +1,6 @@
+:root{
+    --modal-border-color: #b0b0b0
+}
 .modal{
     display: block;
     position: fixed;
@@ -49,7 +52,38 @@
 
 .modal-body{
     padding: 2rem;
+    max-height: 60vh;
+    overflow-y: scroll;
 }
-.modal-footer{
 
+.modal-footer{
+    padding: 1rem;
+    margin: 0 2rem;
+    border-top: var(--modal-border-color) 2px solid;
+}
+.footer-row{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+#settingModal-pagesIndicator{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+#settingModal-pagesIndicator > .page{
+    margin: 0 5px;
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-radius: 10px;
+    background-color: var(--modal-border-color);
+    transition: all 0.5s ease;
+}
+#settingModal-pagesIndicator > .page.active{
+    background-color: dodgerblue;
+    width: 12px;
+    height: 12px;
 }

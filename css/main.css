@@ -9,8 +9,14 @@ body{
     border-radius: 10px;
     background: whitesmoke;
 }
-#main > svg {
-    margin: auto;
+#plots{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.plot{
+    margin: 10px auto;
     display: block;
 }
 .grid line {
@@ -46,4 +52,30 @@ div.tooltip {
     stroke-width: 2;
     fill: white;
     opacity: 0;
+}
+
+button{
+    padding: 16px 32px;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1;
+    color: white;
+    background-color: #1e90ff;
+    border: none;
+    outline: none;
+    overflow: hidden;
+    cursor: pointer;
+    filter: drop-shadow(0 2px 8px rgba(30, 144, 255, 0.32));
+    border-radius: 24px;
+    transition: all 0.5s ease;
+}
+button:hover:enabled{
+    font-size: 20px;
+    padding: 14px 28px;
+}
+button:disabled{
+    background-color: #777777;
+    color: #d0cfcf;
+    filter: drop-shadow(0 2px 8px rgba(119, 119, 119, 0.32));
+    cursor: default;
 }

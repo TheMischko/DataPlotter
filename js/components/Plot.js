@@ -1,20 +1,18 @@
 import * as d3 from "d3";
 import CsvLoader from "./CsvLoader";
 
-export default class MainPlot{
+export default class Plot{
 
-    constructor(element, selector) {
-        const fileLoader = new CsvLoader();
+    constructor(element, selector, options) {
         this.selector = selector;
-        fileLoader.readFile('src/csv_test.csv').then(() => {
-            this.data = fileLoader.getPointsArray('speed_tacho', 'speed_esp');
+        this.options = options;
+        this.data = options.data;
 
-            this.init(element);
+        this.init(element);
 
-            this.setAxis();
+        this.setAxis();
 
-            this.drawPlot();
-        });
+        this.drawPlot();
     }
 
 
@@ -34,9 +32,7 @@ export default class MainPlot{
         this.height = 350 - this.margin.top - this.margin. bottom;
         this.ticksCount = 10;
 
-
-        const countOthers = document.querySelectorAll(this.selector).length;
-        this.DOM_id = 'plot-'+countOthers;
+        this.DOM_id = this.options.DOM_ID;
         // Main element
         this.svg = d3
             .select(element)
@@ -77,7 +73,6 @@ export default class MainPlot{
             .extent([ [0,0], [this.width, this.height] ])
             // Each time the brush selection changes, trigger the 'updateChart' function
             .on("end", (e) => {
-                console.log('Brush selection ended');
                 if(typeof(e.sourceEvent) !== 'undefined') {
                     const event = new Event('plotSelectionChanged')
                     localStorage.setItem('selection', JSON.stringify(e.selection));
@@ -86,10 +81,7 @@ export default class MainPlot{
             });
 
         document.addEventListener('plotSelectionChanged', (data) => {
-            console.log('plotSelectionChanged');
             const selection = JSON.parse(localStorage.getItem('selection'));
-            console.log(data);
-            console.log(selection);
             this.updateChart(this, {selection})
         });
     }
@@ -243,7 +235,6 @@ export default class MainPlot{
      * A function that set idleTimeOut to null
      */
     idled() {
-        console.log('idled();');
         localStorage.setItem('idleTimeout', 'false');
     }
 
@@ -254,7 +245,6 @@ export default class MainPlot{
      * @returns {number}
      */
     updateChart(ref, {selection} ) {
-        console.log(selection);
         let extent = selection;
         let idleTimeout = JSON.parse(localStorage.getItem('idleTimeout'));
 
@@ -340,7 +330,6 @@ export default class MainPlot{
         var bisect = d3.bisector(function(d) { return d.x; }).left;
         const x0 = this.xScale.invert(e.layerX-this.margin.left);
         const i = bisect(this.data, x0, 1);
-        console.log(e);
         d3.selectAll('.tooltip-line')
             .attr('x1', e.layerX-this.margin.left)
             .attr('x2', e.layerX-this.margin.left);

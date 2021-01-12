@@ -1,14 +1,9 @@
 
-import MainPlot from "./components/main-plot";
+import MainPlot from "./components/Plot";
 import CsvLoader from "./components/CsvLoader";
 import Modal from "./components/Settings/SettingsModal";
 import css from '/css/main.css';
 const components = [
-    {
-        class: MainPlot,
-        selector: '.main-plot',
-        options: {}
-    },
     {
         class: Modal,
         selector: '#modal-root',
@@ -25,11 +20,3 @@ components.forEach(component => {
         )
     }
 });
-
-const getCsv = async () => {
-    let csv = new CsvLoader();
-    let data = await csv.readFile('src/csv_test.csv');
-    console.log(csv.getPointsArray('speed_tacho', 'speed_esp'));
-}
-
-getCsv();

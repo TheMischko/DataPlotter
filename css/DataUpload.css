@@ -1,0 +1,56 @@
+/*
+https://tympanus.net/codrops/2015/09/15/styling-customizing-file-inputs-smart-way/
+ */
+.fileUpload-dragndrop,
+.fileUpload-message {
+    margin-top: 1rem;
+    display: none;
+}
+#fileUpload{
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+.fileUpload-box{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto;
+    width: 80%;
+    height: 300px;
+    border-radius: 5px;
+    background: #eeeeee;
+    color: #888888;
+}
+.fileUpload-box.has-advanced-upload{
+    outline-offset: -15px;
+    outline: #b0b0b0 2px dashed;
+}
+
+.fileUpload-box.has-advanced-upload .fileUpload-dragndrop {
+    display: inline;
+}
+
+.fileUpload-box.is-dragover{
+    background: #ffffff;
+}
+label[for="fileUpload"] > strong{
+    cursor: pointer;
+    transition: color 0.5s;
+}
+label[for="fileUpload"] > strong:hover{
+    color: dodgerblue;
+}
+.fileUpload-message.show{
+    display: inline-block;
+}
+.fileUpload-error{
+    color: #ff253a;
+}
+.fileUpload-success{
+    color: #2d8856;
+}
