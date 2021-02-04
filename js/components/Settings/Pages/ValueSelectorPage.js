@@ -19,7 +19,7 @@ export default class ValueSelectorPage extends IModalPage{
      * @returns {string}
      */
     getTitle(){
-        return "Select two value set to explore"
+        return "Select two values (x and y) to explore"
     }
 
 
@@ -43,6 +43,8 @@ export default class ValueSelectorPage extends IModalPage{
 
                 let html = `
             <div class="value-selector" style="columns: ${numHTMLcolumns}">
+                <input class="valueCheckBox" type="checkbox" value="linear">
+                <label class="valueCheckBox-row">Linear scale</label><br/>
             `;
                 columns.forEach((i) => {
                     html += `

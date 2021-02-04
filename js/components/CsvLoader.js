@@ -33,15 +33,16 @@ export default class CsvLoader {
         this.points = [];
         let i = 0
         this.data.forEach( (row) => {
+            row['linear'] = i;
             if(typeof(row[xColumn]) !== 'undefined' && typeof(row[yColumn]) !== 'undefined'){
-
                 this.points.push({
-                    x: i,
+                    x: parseFloat(row[xColumn]),
                     y: parseFloat(row[yColumn])
                 });
                 i++;
             }
         });
+        console.log(this.points);
         return this.points;
     }
 

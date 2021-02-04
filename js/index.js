@@ -20,3 +20,8 @@ components.forEach(component => {
         )
     }
 });
+
+document.addEventListener('plotMouseOver', (e) => {
+    //console.log('plotMouseOver');
+    //console.log(e);
+})

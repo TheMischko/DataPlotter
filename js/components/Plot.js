@@ -4,11 +4,21 @@ import CsvLoader from "./CsvLoader";
 export default class Plot{
 
     constructor(element, selector, options) {
+        this.element = element;
+
+        //console.log("Margin left: "+ this.element.offsetLeft);
         this.selector = selector;
         this.options = options;
         this.data = options.data;
+        this.group = options.group;
+
+        d3.select(element).attr('group', this.group);
 
         this.init(element);
+
+        console.log('Selector: ' + selector);
+        console.log('Element: ' + this.element);
+        console.log(this.element.getBoundingClientRect());
 
         this.setAxis();
 
@@ -43,11 +53,18 @@ export default class Plot{
             .attr("transform",
                 "translate("+this.margin.left+","+this.margin.top+")")
             .on("mousemove", (e) => {
-                this.showMouseTooltip(e);
+                let eventData = e;
+                eventData.group = this.group;
+                const event = new MouseEvent('plotMouseOver', eventData)
+                document.dispatchEvent(event);
             });
 
+        document.addEventListener('plotMouseOver', e => {
+            this.showMouseTooltip(e);
+        })
+
         // Tooltip div
-        this.tooltip = d3.select(this.DOM_id)
+        this.tooltip = d3.select(document.body)
             .append('div')
             .attr('class', 'tooltip')
             .style('opacity', 0)
@@ -328,25 +345,17 @@ export default class Plot{
     showMouseTooltip(e) {
         // This allows to find the closest X index of the mouse:
         var bisect = d3.bisector(function(d) { return d.x; }).left;
-        const x0 = this.xScale.invert(e.layerX-this.margin.left);
+        const x0 = this.xScale.invert(e.pageX-this.element.getBoundingClientRect().x-this.margin.left);
         const i = bisect(this.data, x0, 1);
         d3.selectAll('.tooltip-line')
-            .attr('x1', e.layerX-this.margin.left)
-            .attr('x2', e.layerX-this.margin.left);
-        this.tooltip.transition()
-            .duration('100')
-            .style('opacity', 1);
+            .attr('x1', e.pageX-this.element.getBoundingClientRect().x-this.margin.left)
+            .attr('x2', e.pageX-this.element.getBoundingClientRect().x-this.margin.left);
+        if(typeof (this.data[i].x) === 'undefined' || typeof (this.data[i].y) === 'undefined'){
+            return
+        }
+        this.tooltip.style('opacity', 1);
         this.tooltip.html('['+this.data[i].x+'; '+this.data[i].y+']')
-            .style('left', (this.xScale(this.data[i].x) + 10) + "px")
-            .style('top', (this.yScale(this.data[i].y)+ 10) + "px")
-
-        const graphs = document.querySelectorAll(this.selector);
-        graphs.forEach((node) => {
-            if(node.getAttribute('id') === this.DOM_id)
-                return;
-            const event = new MouseEvent('mousemove', e);
-            node.dispatchEvent(event);
-
-        })
+            .style('left', (this.xScale(this.data[i].x) + 10 + this.element.getBoundingClientRect().x) + "px")
+            .style('top', (this.yScale(this.data[i].y)+ 10 + this.element.getBoundingClientRect().y) + "px");
     }
 }

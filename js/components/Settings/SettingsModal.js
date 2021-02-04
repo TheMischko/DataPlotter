@@ -112,14 +112,13 @@ export default class SettingsModal extends Modal{
         document.dispatchEvent(onFinishEvent);
         const modalInDOM = d3.selectAll('#'+this.DOM_ID)
                             .transition()
-                            .duration(500)
-                            .style("opacity", 0)
-                            .style('display', 'none');
+                                .duration(500)
+                                .style("opacity", 0)
+                                .style('display', 'none');
 
         setTimeout(()=>{
             modalInDOM.style('display', 'none');
-            console.log('none');
-        }, 700);
+        }, 1000);
 
         this.createPlots();
     }
@@ -141,7 +140,8 @@ export default class SettingsModal extends Modal{
                 const element = document.getElementById('wrapper-plot-'+i);
                 new Plot(element, '.'+classed, {
                     DOM_ID: id,
-                    data: data
+                    data: data,
+                    group: 1
                 });
             }
         });
