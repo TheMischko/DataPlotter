@@ -9,6 +9,62 @@ body{
     border-radius: 10px;
     background: whitesmoke;
 }
+#wrapper{
+    width: 90%;
+    margin: 0 auto;
+    padding: 10px;
+    display: flex;
+    border-radius: 15px;
+    flex-direction: row-reverse;
+    justify-content: space-around;
+    align-items: flex-start;
+    background: mediumseagreen;
+}
+.side-bar{
+    width: 100%;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.zoomButton{
+    margin: 10px 0;
+}
+.zoomButton > input{
+    background: none;
+    outline: none;
+    border: none;
+    color: white;
+    padding: 0;
+}
+.zoomButton > input::-webkit-input-placeholder{
+    color: white;
+}
+.zoomButton > input:-ms-input-placeholder{
+    color: white;
+}
+.zoomButton > input::placeholder{
+    color: white;
+}
+.option-tile{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: white;
+    border-radius: 5px;
+    margin: 10px;
+    padding: 10px;
+}
+.option-tile > h1 {
+    border-bottom: 2px solid grey;
+    width: 90%;
+}
+.option-tile > button{
+     width: 250px;
+     text-align: center;
+ }
 #plots{
     display: flex;
     flex-direction: column;
@@ -16,8 +72,11 @@ body{
     align-items: center;
 }
 .plot{
-    margin: 10px auto;
+    margin: 0 0 10px 0;
     display: block;
+    background: white;
+    border-radius: 5px;
+    padding: 10px 5px;
 }
 .grid line {
     stroke: lightgrey;
@@ -70,7 +129,7 @@ button{
     transition: all 0.5s ease;
 }
 button:hover:enabled{
-    font-size: 20px;
+    font-size: 18px;
     padding: 14px 28px;
 }
 button:disabled{
@@ -78,4 +137,12 @@ button:disabled{
     color: #d0cfcf;
     filter: drop-shadow(0 2px 8px rgba(119, 119, 119, 0.32));
     cursor: default;
+}
+button.success{
+    background-color: #2ecc40;
+    filter: drop-shadow(0 2px 8px rgba(28, 103, 43, 0.32));
+}
+button.danger{
+    background-color: #ff4136;
+    filter: drop-shadow(0 2px 8px rgba(150, 48, 42, 0.32));
 }

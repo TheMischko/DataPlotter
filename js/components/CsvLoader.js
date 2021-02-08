@@ -42,7 +42,6 @@ export default class CsvLoader {
                 i++;
             }
         });
-        console.log(this.points);
         return this.points;
     }
 

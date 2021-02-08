@@ -18,6 +18,7 @@ export default class SettingsModal extends Modal{
         this.activePage = 0
         this.numOfPlots = 2;
         this.data = {};
+        this.zoomManager = options.zoomManager;
         this.setupContent()
 
         this.redraw();
@@ -139,6 +140,7 @@ export default class SettingsModal extends Modal{
                     .classed('plot', true);
                 const element = document.getElementById('wrapper-plot-'+i);
                 new Plot(element, '.'+classed, {
+                    zoomManager: this.zoomManager,
                     DOM_ID: id,
                     data: data,
                     group: 1

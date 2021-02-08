@@ -9,6 +9,7 @@ export default class Plot{
         //console.log("Margin left: "+ this.element.offsetLeft);
         this.selector = selector;
         this.options = options;
+        this.zoomManager = options.zoomManager;
         this.data = options.data;
         this.group = options.group;
 
@@ -16,9 +17,9 @@ export default class Plot{
 
         this.init(element);
 
-        console.log('Selector: ' + selector);
-        console.log('Element: ' + this.element);
-        console.log(this.element.getBoundingClientRect());
+        //console.log('Selector: ' + selector);
+        //console.log('Element: ' + this.element);
+        //console.log(this.element.getBoundingClientRect());
 
         this.setAxis();
 
@@ -38,8 +39,8 @@ export default class Plot{
             left:60
         }
         // Setting dimensions of the plot
-        this.width = 1000 - this.margin.left - this.margin.right;
-        this.height = 350 - this.margin.top - this.margin. bottom;
+        this.width = window.innerWidth/2 - this.margin.left - this.margin.right;
+        this.height = window.innerHeight/2.5 - this.margin.top - this.margin. bottom;
         this.ticksCount = 10;
 
         this.DOM_id = this.options.DOM_ID;
@@ -83,6 +84,13 @@ export default class Plot{
         // A function that set idleTimeOut to null
         localStorage.setItem('idleTimeout', null)
 
+        // A function that set idleTimeOut to null
+        localStorage.setItem('selection', JSON.stringify([0, this.width]));
+
+        localStorage.setItem('default-selection', JSON.stringify([0, this.width]));
+
+        localStorage.setItem('activeZoom', null);
+
         // Add brushing
         this.brush = d3.brushX()
             // initialise the brush area: start at 0,0 and finishes at width,height:
@@ -92,15 +100,17 @@ export default class Plot{
             .on("end", (e) => {
                 if(typeof(e.sourceEvent) !== 'undefined') {
                     const event = new Event('plotSelectionChanged')
+                    event.from = 'mouse';
                     localStorage.setItem('selection', JSON.stringify(e.selection));
                     document.dispatchEvent(event);
                 }
             });
 
         document.addEventListener('plotSelectionChanged', (data) => {
-            const selection = JSON.parse(localStorage.getItem('selection'));
-            this.updateChart(this, {selection})
+            let selection = JSON.parse(localStorage.getItem('selection'));
+            this.updateChart(this, {selection}, true)
         });
+
     }
 
 
@@ -259,9 +269,10 @@ export default class Plot{
      * Function that redraw graph in chosen region for zoom.
      * @param ref This object
      * @param selection Tuple of starting point and ending point for zoom.
+     * @param resetSelectionAfter Boolean if method should save default selection value into selection.
      * @returns {number}
      */
-    updateChart(ref, {selection} ) {
+    updateChart(ref, {selection}, resetSelectionAfter = false ) {
         let extent = selection;
         let idleTimeout = JSON.parse(localStorage.getItem('idleTimeout'));
 
@@ -282,11 +293,11 @@ export default class Plot{
         //Update axis and circle position
         ref.xAxis
             .transition()
-            .duration(1000)
+            .duration(200)
             .call(d3.axisBottom(ref.xScale))
         ref.xGrid
             .transition()
-            .duration(1000)
+            .duration(200)
             .call(this.makeGridLinesX()
                 .tickSize(-ref.height)
                 .tickFormat(""));
@@ -303,13 +314,13 @@ export default class Plot{
         ref.lineGraph
             .selectAll('path')
             .transition()
-            .duration(1000)
+            .duration(200)
             .attr('d', this.lineFunction(this.data));
 
         ref.points
             .selectAll('.dot')
             .transition()
-            .duration(1000)
+            .duration(200)
             .attr('cx', (data) => ref.xScale(data.x))
             .attr('cy', (data) => ref.yScale(data.y))
     }
@@ -350,7 +361,7 @@ export default class Plot{
         d3.selectAll('.tooltip-line')
             .attr('x1', e.pageX-this.element.getBoundingClientRect().x-this.margin.left)
             .attr('x2', e.pageX-this.element.getBoundingClientRect().x-this.margin.left);
-        if(typeof (this.data[i].x) === 'undefined' || typeof (this.data[i].y) === 'undefined'){
+        if(typeof (this.data[i]) === 'undefined'){
             return
         }
         this.tooltip.style('opacity', 1);
