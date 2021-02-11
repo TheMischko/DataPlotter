@@ -28,9 +28,6 @@ body{
     align-items: center;
     justify-content: center;
 }
-.zoomButton{
-    margin: 10px 0;
-}
 .zoomButton > input{
     background: none;
     outline: none;
@@ -64,7 +61,15 @@ body{
 .option-tile > button{
      width: 250px;
      text-align: center;
+     margin: 10px 0;
+    display: flex;
+    justify-items: center;
+    align-items: center;
+    flex-direction: row;
  }
+.option-tile > button > i{
+    margin-right: 5px;
+}
 #plots{
     display: flex;
     flex-direction: column;
@@ -145,4 +150,33 @@ button.success{
 button.danger{
     background-color: #ff4136;
     filter: drop-shadow(0 2px 8px rgba(150, 48, 42, 0.32));
+}
+
+.zoomButton.deleteMode{
+    animation: shake 1s cubic-bezier(.36, .07, .19, .97) both infinite;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+.zoomButton.deleteMode:hover{
+    animation: shake 0s;
+}
+
+@keyframes shake {
+    10%, 90% {
+        transform: translate3d(-1px, 0, 0);
+    }
+
+    20%, 80% {
+        transform: translate3d(2px, 0, 0);
+    }
+
+    30%, 50%, 70% {
+        transform: translate3d(-3px, 0, 0);
+    }
+
+    40%, 60% {
+        transform: translate3d(3px, 0, 0);
+    }
 }

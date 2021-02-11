@@ -17,8 +17,7 @@ export default class ZoomsTile {
 
     parent.append('button')
       .attr('id', 'add-zoom')
-      .html('+ Save current zoom')
-      .classed('zoomButton', 'true')
+      .html('<i class="fas fa-plus"></i>&nbsp;Save current zoom')
       .classed('success', true)
       .on('click', (e) => {
         this.addZoomClicked(e);
@@ -37,6 +36,7 @@ export default class ZoomsTile {
   appendZoomButton(barElement, zoomId, name, startWithInput){
     const button = barElement.append('button')
       .classed('zoomButton', true)
+      .attr('name', name)
       .attr('zoom-id', zoomId)
       .on('click', (e) => {this.savedZoomButtonClicked(e)})
       .on('dblclick', (e) => {this.savedButtonDoubleClk(e)});
@@ -76,21 +76,47 @@ export default class ZoomsTile {
     }
     const zoomID = Number(target.getAttribute('zoom-id'));
     const zoomSequence = this.zoomManager.getZoomByID(zoomID).zoomSequence;
+    if(target.classList.contains('deleteMode')){
+      this.savedZoomButtonDeleteClicked(target, zoomID);
+      return;
+    }
     // If is current view set over whole plot ignore the first step of zoomPath aka 'Go back to default'
     if(this.zoomManager.getCurrentZoomPath().length === 1) {
       zoomSequence.splice(0, 1);
     }
     for(let i = 0; i < zoomSequence.length; i++) {
       setTimeout(() => {
-        const event = new Event('plotSelectionChanged');
-        event.from = 'button';
         if(i === 0 && zoomSequence[i] === null)
-          localStorage.setItem('selection', JSON.stringify(null));
+          this.zoomManager.setSelection(null)
         else
-          localStorage.setItem('selection', JSON.stringify([zoomSequence[i][0], zoomSequence[i][1]]));
+          this.zoomManager.setSelection([zoomSequence[i][0], zoomSequence[i][1]]);
         localStorage.setItem('activeZoom', JSON.stringify(zoomID));
-        document.dispatchEvent(event);
+        this.zoomManager.fireChangeEvent('button');
       }, 300*i);
+    }
+  }
+
+
+  savedZoomButtonDeleteClicked(target, zoomID){
+    const name = target.getAttribute('name');
+    if(target.classList.contains('deleteReady')){
+      d3.select(target)
+        .remove();
+      this.zoomManager.deleteZoom(zoomID);
+    } else {
+      d3.select(target)
+        .classed('danger', false)
+        .classed('deleteReady', true)
+        .select('div')
+        .text('Are you sure?');
+
+      setTimeout(() => {
+        d3.select(target)
+          .classed('danger', true)
+          .classed('deleteReady', false)
+          .select('div')
+          .text(name);
+      }, 3000);
     }
   }
 
@@ -122,6 +148,8 @@ export default class ZoomsTile {
     // Hide input
     d3.select(e.target)
       .style('display', 'none');
+    d3.select(e.target.parentNode)
+      .attr('name', nameVal);
     this.zoomManager.updateZoom(Number(e.target.getAttribute('zoom-id')), {name: nameVal});
   }
 

@@ -35,6 +35,15 @@ export default class ZoomManager {
   }
 
   /**
+   * Sets value of actual selection.
+   * Used for changing zooms.
+   * @param {null|*[]}selectionValue
+   */
+  setSelection(selectionValue) {
+    localStorage.setItem('selection', JSON.stringify(selectionValue));
+  }
+
+  /**
    * Gets all zooms saved in storage.
    * @returns {Zoom[]}
    */
@@ -157,5 +166,13 @@ export default class ZoomManager {
       zoomPath.push(selection);
       localStorage.setItem('zoomPath', JSON.stringify(zoomPath));
     }
+  }
+
+
+  fireChangeEvent(from = null) {
+    const event = new Event('plotSelectionChanged');
+    if(from !== null)
+      event.from = from;
+    document.dispatchEvent(event);
   }
 }
