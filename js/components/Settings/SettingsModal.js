@@ -15,12 +15,28 @@ export default class SettingsModal extends Modal{
 
     constructor(parentNode, selector, options) {
         super(parentNode, selector, options);
+        this.selector = selector;
         this.activePage = 0
         this.numOfPlots = 2;
         this.data = {};
         this.zoomManager = options.zoomManager;
-        this.setupContent()
+        this.init();
+    }
 
+
+    init() {
+        document.addEventListener('DOMContentLoaded', e => this.onPageLoadedHandler(e));
+        document.addEventListener('showSettingsModal', e => this.onShowNeededHandler(e));
+    }
+
+
+    onPageLoadedHandler() {
+        d3.select('#'+this.DOM_ID).classed('hidden', true);
+    }
+
+
+    onShowNeededHandler() {
+        this.setupContent()
         this.redraw();
     }
 
@@ -90,6 +106,10 @@ export default class SettingsModal extends Modal{
 
             activeContent.initFunctions();
         })
+        setTimeout(() => {
+            d3.select('#'+this.DOM_ID).classed('hidden', false);
+        }, 100);
+
     }
 
 
@@ -109,7 +129,8 @@ export default class SettingsModal extends Modal{
 
     onFinishHandler(){
         console.log(this.data);
-        const onFinishEvent = new CustomEvent('setupFinished', { settings: this.data });
+        const onFinishEvent = new CustomEvent('setupFinished');
+        onFinishEvent.settings = this.data
         document.dispatchEvent(onFinishEvent);
         const modalInDOM = d3.selectAll('#'+this.DOM_ID)
                             .transition()
@@ -120,33 +141,5 @@ export default class SettingsModal extends Modal{
         setTimeout(()=>{
             modalInDOM.style('display', 'none');
         }, 1000);
-
-        this.createPlots();
-    }
-
-
-    createPlots(){
-        const plotsWrapper = d3.select('#plots');
-
-        const csv = new CsvLoader();
-        csv.readFile(this.data.files[0]).then(r => {
-            const data = csv.getPointsArray(this.data.axes.x, this.data.axes.y);
-
-            for(let i = 0; i<this.numOfPlots; i++){
-                const id = 'plot-'+i;
-                const classed = 'plot';
-                plotsWrapper.append('svg')
-                    .attr('id', 'wrapper-plot-'+i)
-                    .classed('plot', true);
-                const element = document.getElementById('wrapper-plot-'+i);
-                new Plot(element, '.'+classed, {
-                    zoomManager: this.zoomManager,
-                    DOM_ID: id,
-                    data: data,
-                    group: 1
-                });
-            }
-        });
-
     }
 }

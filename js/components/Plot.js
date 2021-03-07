@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import CsvLoader from "./CsvLoader";
+import css from "../../css/plot.css"
 
 export default class Plot{
 
@@ -12,8 +13,12 @@ export default class Plot{
         this.zoomManager = options.zoomManager;
         this.data = options.data;
         this.group = options.group;
+        this.parent = d3.select(this.element.parentNode);
 
         d3.select(element).attr('group', this.group);
+        window.addEventListener('resize', (e) => {
+            this.resize(e);
+        })
 
         this.init(element);
 
@@ -36,11 +41,11 @@ export default class Plot{
             top: 10,
             right: 30,
             bottom: 30,
-            left:60
+            left: window.innerWidth < 900 ? 40 : 60
         }
         // Setting dimensions of the plot
-        this.width = window.innerWidth/2 - this.margin.left - this.margin.right;
-        this.height = window.innerHeight/2.5 - this.margin.top - this.margin. bottom;
+        this.width = this.parent.node().offsetWidth - this.margin.left - this.margin.right;
+        this.height = window.innerHeight/2.2 - this.margin.top - this.margin. bottom;
         this.ticksCount = 10;
 
         this.DOM_id = this.options.DOM_ID;
@@ -131,11 +136,13 @@ export default class Plot{
 
         this.xAxis = this.svg
             .append("g")
+            .attr('id', 'xAxis')
             .attr("transform", "translate(0," + this.height + ")")
             .attr("class", "axis")
             .call(d3.axisBottom(this.xScale));
 
         this.xGrid = this.svg.append('g')
+            .attr('id', 'xGrid')
             .attr('class', 'grid')
             .attr("transform", "translate(0," + this.height + ")")
             .call(this.makeGridLinesX()
@@ -150,11 +157,13 @@ export default class Plot{
             .range([this.height, 0]);
 
         this.svg.append("g")
+            .attr('id', 'yAxis')
             .attr("class", "axis")
             .call(d3.axisLeft(this.yScale))
 
         this.svg.append('g')
             .attr('class', 'grid')
+            .attr('id', 'yGrid')
             .call(this.makeGridlinesY()
                 .tickSize(-this.width)
                 .tickFormat(''));
@@ -187,6 +196,7 @@ export default class Plot{
             .attr("clip-path", "url(#"+this.clipId+")");
         this.lineGraph
             .append('path')
+            .attr('id', 'lineGraph-path')
             .attr('class', 'curve')
             .attr('d', this.lineFunction(this.data));
         // Points
@@ -368,5 +378,88 @@ export default class Plot{
         this.tooltip.html('['+this.data[i].x+'; '+this.data[i].y+']')
             .style('left', (this.xScale(this.data[i].x) + 10 + this.element.getBoundingClientRect().x) + "px")
             .style('top', (this.yScale(this.data[i].y)+ 10 + this.element.getBoundingClientRect().y) + "px");
+    }
+
+    resize(e){
+        this.margin.left = window.innerWidth < 900 ? 40 : 60;
+        this.width = this.parent.node().offsetWidth - this.margin.left - this.margin.right;
+        this.height = window.innerHeight/2.5 - this.margin.top - this.margin. bottom;
+
+        this.svg = d3
+          .select(this.element)
+          .attr('width', this.width + this.margin.left + this.margin.right)
+          .attr('height', this.height + this.margin.top + this.margin. bottom)
+          .select("g")
+          .attr("transform",
+            "translate("+this.margin.left+","+this.margin.top+")");
+
+        const clip_test = this.svg.select("defs")
+          .select("clipPath")
+          .select("rect")
+          .attr("width", this.width)
+          .attr("height", this.height)
+          .attr("x", 0)
+          .attr("y", 0);
+
+        this.brush.extent([ [0,0], [this.width, this.height] ]);
+
+        const boundaries = this.findBoundaries();
+
+        this.xScale = d3.scaleLinear()
+          .domain([boundaries.minX, boundaries.maxX])
+          .range([0, this.width])
+          .nice(50);
+
+        this.xAxis = this.svg
+          .select('#xAxis')
+          .attr("transform", "translate(0," + this.height + ")")
+          .call(d3.axisBottom(this.xScale));
+
+        this.xGrid = this.svg
+          .select('#xGrid')
+          .attr("transform", "translate(0," + this.height + ")")
+          .call(this.makeGridLinesX()
+            .tickSize(-this.height)
+            .tickFormat(""));
+
+        /***********************************
+         Y axis
+         ***********************************/
+        this.yScale = d3.scaleLinear()
+          .domain([boundaries.minY, boundaries.maxY])
+          .range([this.height, 0]);
+
+        this.svg.select("#yAxis")
+          .call(d3.axisLeft(this.yScale))
+
+        this.svg.select('#yGrid')
+          .call(this.makeGridlinesY()
+            .tickSize(-this.width)
+            .tickFormat(''));
+
+        this.svg
+          .select(`[target-id=${this.DOM_id}]`)
+          .attr('target-id', this.DOM_id)
+          .attr('x1', 100)
+          .attr('x2', 100)
+          .attr('y1', 0)
+          .attr('y2', this.height)
+
+        this.lineGraph
+          .select('#lineGraph-path')
+          .attr('d', this.lineFunction(this.data));
+
+        this.points
+          .select('.brush')
+          .call(this.brush)
+
+        this.points
+          .selectAll('.dot')
+          .data(this.data)
+          .enter()
+          .select('circle')
+          .attr('r', 3)
+          .attr('cx', (data) => this.xScale(data.x))
+          .attr('cy', (data) => this.yScale(data.y))
     }
 }

@@ -1,0 +1,88 @@
+#plots{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 95%;
+    margin: 0 5px;
+}
+.plot{
+    margin: 0 0 10px 0;
+    display: block;
+    background: white;
+    border-radius: 5px;
+    padding: 10px 5px;
+}
+.grid line {
+    stroke: lightgrey;
+    stroke-opacity: 0.7;
+    shape-rendering: crispEdges;
+}
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    padding: 5px;
+    background: mediumseagreen;
+    color: whitesmoke;
+    border: 2px solid #2d8856;
+    border-radius: 8px;
+    pointer-events: none;
+    font-size: 10px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    transform: translateY(-40px);
+}
+.axis {
+    shape-rendering: crispEdges;
+    font-family: 'Lato', sans-serif;
+    font-size: 9px;
+}
+#xAxis > .tick:nth-of-type(2n) > text {
+    transform: translateY(10px);
+}
+.curve{
+    stroke: mediumseagreen;
+    stroke-width: 2;
+    fill: none
+}
+.dot{
+    stroke: mediumseagreen;
+    stroke-width: 2;
+    fill: white;
+    opacity: 0;
+}
+@media only screen and (min-width: 800px) {
+    .axis {
+        font-size: 12px;
+    }
+
+    div.tooltip {
+        font-size: 14px;
+    }
+}
+@media only screen and (min-width: 1050px) {
+    #xAxis > .tick:nth-of-type(2n) > text {
+        transform: translateY(11px);
+    }
+    .axis {
+        font-size: 14px;
+    }
+
+    div.tooltip {
+        font-size: 16px;
+    }
+}
+@media only screen and (min-width: 1500px) {
+}
+@media only screen and (min-width: 1800px) {
+    #xAxis > .tick:nth-of-type(2n) > text {
+        transform: translateY(10px);
+    }
+    .axis {
+        font-size: 15px;
+    }
+
+    div.tooltip {
+        font-size: 17px;
+    }
+}

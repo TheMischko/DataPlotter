@@ -43,13 +43,19 @@ export default class ValueSelectorPage extends IModalPage{
 
                 let html = `
             <div class="value-selector" style="columns: ${numHTMLcolumns}">
-                <input class="valueCheckBox" type="checkbox" value="linear">
-                <label class="valueCheckBox-row">Linear scale</label><br/>
+                <label class="valueCheckBox-row">
+                    Linear scale
+                    <input class="valueCheckBox" type="checkbox" value="linear">
+                    <span class="checkmark"></span>
+                </label>
             `;
                 columns.forEach((i) => {
                     html += `
-                    <input class="valueCheckBox" type="checkbox" value="${i}">
-                    <label class="valueCheckBox-row">${i}</label><br/>
+                    <label class="valueCheckBox-row">
+                        ${i}
+                        <input class="valueCheckBox" type="checkbox" value="${i}">
+                        <span class="checkmark"></span>
+                    </label>
                     `
                 });
                 html += `</div>`
