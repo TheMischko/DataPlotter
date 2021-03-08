@@ -49,6 +49,11 @@ document.addEventListener('plotMouseOver', (e) => {
     //console.log(e);
 });
 
+document.addEventListener('plotMouseLeave', (e) => {
+    //console.log('plotMouseLeave');
+    //console.log(e);
+});
+
 document.addEventListener('setupFinished', (e) => {
     document.getElementById('wrapper').style.opacity = '1';
     //console.log('setupFinished');

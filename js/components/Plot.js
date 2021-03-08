@@ -59,9 +59,15 @@ export default class Plot{
             .attr("transform",
                 "translate("+this.margin.left+","+this.margin.top+")")
             .on("mousemove", (e) => {
-                let eventData = e;
-                eventData.group = this.group;
-                const event = new MouseEvent('plotMouseOver', eventData)
+                const event = new MouseEvent('plotMouseOver', e)
+                event.group = this.group;
+                event.sourcePlot = this.element;
+                document.dispatchEvent(event);
+            })
+            .on("mouseleave", (e) => {
+                const event = new MouseEvent('plotMouseLeave', e)
+                event.group = this.group;
+                event.sourcePlot = this.element;
                 document.dispatchEvent(event);
             });
 

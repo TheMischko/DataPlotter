@@ -119,6 +119,10 @@ button.danger{
 .zoomButton.deleteMode:hover{
     animation: shake 0s;
 }
+#plotTile{
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
 
 @keyframes shake {
     10%, 90% {

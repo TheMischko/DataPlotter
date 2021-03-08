@@ -1,5 +1,4 @@
 import * as d3 from "d3";
-import ZoomsTile from "./ZoomsTile";
 import PlotToolsTile from "./PlotToolsTile";
 
 export default class LeftBar{
@@ -15,8 +14,8 @@ export default class LeftBar{
     document.addEventListener('setupFinished', (e) => {
       bar.style('opacity', '1');
     });
-
-    const plotTileID = 'zoomsTile';
+    // Create PlotTool menu tile
+    const plotTileID = 'plotTile';
     const plotTileElement = bar.append('div').attr('id', plotTileID).node();
     const zoomTile = new PlotToolsTile(plotTileElement, '#'+plotTileID, {});
   }
