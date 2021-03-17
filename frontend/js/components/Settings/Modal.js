@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import css from "/css/modal.css"
+import css from "../../../css/modal.css"
 
 /**
  * Component representing Modal window in HTML DOM.

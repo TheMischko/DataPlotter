@@ -5,7 +5,7 @@ import Modal from "./components/Settings/SettingsModal";
 import RightBar from "./components/RightBar";
 import ZoomManager from "./components/Managers/ZoomManager";
 import PlotManager from "./components/Managers/PlotManager";
-import css from '/css/main.css';
+import css from "../css/main.css"
 import LeftBar from "./components/LeftBar";
 
 const zoomManager = new ZoomManager();

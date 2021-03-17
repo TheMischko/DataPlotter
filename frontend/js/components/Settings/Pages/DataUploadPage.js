@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import IModalPage from "./IModalPage";
-import css from '/css/DataUpload.css'
+import css from "../../../../css/DataUpload.css"
 
 export default class DataUploadPage extends IModalPage{
 

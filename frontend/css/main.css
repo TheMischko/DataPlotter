@@ -146,11 +146,19 @@ button.danger{
         font-size: 14px;
         padding: 12px 24px;
     }
+    button:hover:enabled{
+        font-size: 16px;
+        padding: 11px 23px;
+    }
 }
 @media only screen and (min-width: 1050px) {
     button{
         font-size: 16px;
         padding: 14px 28px;
+    }
+    button:hover:enabled{
+        font-size: 18px;
+        padding: 13px 27px;
     }
 }
 @media only screen and (min-width: 1500px) {
