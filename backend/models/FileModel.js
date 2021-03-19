@@ -53,12 +53,16 @@ const saveCSV = (inFile) => {
   }));
 }
 
-
+/**
+ * Look for a file under the ID in database and return it.
+ * Async function, resolve in file, reject if file not found
+ * @param fileID Number - ID of file in database
+ * @returns {Promise<Object>} File
+ */
 const getFileByID = (fileID) => {
   return new Promise(((resolve, reject) => {
     File.findOne({_id: fileID}, (err, file) => {
       if(err || typeof file === "undefined" || file === null) {
-        console.log(err || "File not found");
         reject();
       } else {
         resolve(file)
@@ -95,5 +99,6 @@ const findSimilarFile = (md5, mimetype) => {
 
 
 module.exports = {
-  saveCSV: saveCSV
+  saveCSV: saveCSV,
+  getFileByID: getFileByID
 }
