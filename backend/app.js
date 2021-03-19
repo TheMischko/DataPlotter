@@ -12,6 +12,7 @@ const mongoose = require('mongoose');
 
 
 const indexRouter = require('./routes/index');
+const zoomRouter = require('./routes/zoomRouter');
 
 const app = express();
 
@@ -38,5 +39,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors())
 
 app.use('/', indexRouter);
+app.use('/zoom', zoomRouter);
 
 module.exports = app;
