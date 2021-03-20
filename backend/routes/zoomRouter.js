@@ -4,7 +4,7 @@ const zoomModel = require('../models/ZoomModel');
 
 router.get('/', ((req, res) => {
   const viewID = req.query.viewID;
-  if(typeof viewID === "undefined")
+  if(typeof viewID === "undefined"){}
     res.status(400).send('Bad request.');
   zoomModel.getZoomsForView(viewID).then(
     (zooms) => { res.status(200).send(JSON.stringify(zooms)) },

@@ -8,10 +8,13 @@ const View = mongoose.model('Views', viewSchema);
  */
 const getViews = () => {
   return new Promise(((resolve, reject) => {
-    View.find().then((err, views) => {
-      if(err)
+    View.find((err, views) => {
+      if(err) {
         reject(err);
-      resolve(views);
+      }
+      else {
+        resolve(views);
+      }
     });
   }));
 };
@@ -23,7 +26,7 @@ const getViews = () => {
  */
 const getViewByID = (viewID) => {
   return new Promise(((resolve, reject) => {
-    View.find({_id: viewID}).then((err, views) => {
+    View.find({_id: viewID},(err, views) => {
       if(err)
         reject(err);
       resolve(views);

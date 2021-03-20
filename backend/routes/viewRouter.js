@@ -33,7 +33,7 @@ router.post('/add', ((req, res) => {
       (err) => { res.status(400).send(err) }
     );
   } catch (ex) {
-    res.status(400).send(ex);
+    res.status(400).send(ex.message);
   }
 }));
 
@@ -48,24 +48,27 @@ router.post('/delete', ((req, res) => {
 }));
 
 
-router.post('/add', ((req, res) => {
-  let id = undefined;
+router.post('/edit', ((req, res) => {
+  let viewID = undefined;
   let fileID = undefined;
   let title = undefined;
   let plotSettings = undefined
   try {
-    id = req.body.id;
+    viewID = req.body.viewID;
     fileID = req.body.fileID;
     title = req.body.title;
     plotSettings = JSON.parse(req.body.plotSettings)
   } catch (ex) {}
-  const changes = {
-    fileID: fileID,
-    title: title,
-    plotSettings: plotSettings
-  }
+  const changes = {};
 
-  viewModel.editView(id, changes).then(
+  if(typeof fileID !== "undefined")
+    changes["fileID"] = fileID;
+  if(typeof title !== "undefined")
+    changes["title"] = title;
+  if(typeof plotSettings !== "undefined")
+    changes["plotSettings"] = plotSettings;
+
+  viewModel.editView(viewID, changes).then(
     (id) => { res.status(200).send(id) },
     (err) => { res.status(400).send(err) }
   );
