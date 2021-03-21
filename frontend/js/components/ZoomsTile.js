@@ -16,6 +16,7 @@ export default class ZoomsTile {
       .text('Saved zooms:');
 
     document.addEventListener('setupFinished', (e) => {
+      parent.selectAll('.zoomButton').remove();
       this.zoomManager.getAllZooms().then((zooms) => {
         this.zoomManager.setLocalZooms(zooms);
         for(let i = 0; i < zooms.length; i++){

@@ -17,13 +17,17 @@ export default class ZoomToolsTile {
       .text('Tools:');
 
     parent.append('button')
+      .html('<i class="fas fa-chart-line"></i>&nbsp;Load new plot')
+      .on('click', (e) => { this.loadNewPlotButtonClicked(e) })
+
+    parent.append('button')
       .html('<i class="fas fa-undo"></i>&nbsp;Reset view')
-      .on('click', (e) => {this.resetViewButtonOnClick(e)});
+      .on('click', (e) => { this.resetViewButtonOnClick(e) });
 
     parent.append('button')
       .html('<i class="fas fa-trash"></i>&nbsp;Delete zooms mode')
       .classed('danger', true)
-      .on('click', (e) => {this.deleteModeButtonOnClick(e)})
+      .on('click', (e) => { this.deleteModeButtonOnClick(e) })
   }
 
 
@@ -61,5 +65,12 @@ export default class ZoomToolsTile {
   resetViewButtonOnClick(e) {
     this.zoomManager.setSelection(null);
     this.zoomManager.fireChangeEvent();
+  }
+
+
+  loadNewPlotButtonClicked(e) {
+    const event = new Event('setupNeeded')
+    event.source = e.target;
+    document.dispatchEvent(event);
   }
 }

@@ -62,6 +62,8 @@ export default class PlotManager {
     if(typeof e.fromInit !== "undefined" && e.fromInit)
       return;
     const plotData = JSON.parse(localStorage.getItem("plotData"));
+    d3.select(this.wrapperElement).html('');
+    d3.selectAll('.tooltip').remove();
     plotData.forEach(plot => {
       this.createPlot(plot)
     });

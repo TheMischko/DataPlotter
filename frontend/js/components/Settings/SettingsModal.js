@@ -24,7 +24,6 @@ export default class SettingsModal extends Modal{
         super(parentNode, selector, options);
         this.selector = selector;
         this.activePage = 0
-        this.numOfPlots = 2;
         this.data = {};
         this.zoomManager = options.zoomManager;
         this.init();
@@ -34,6 +33,7 @@ export default class SettingsModal extends Modal{
     init() {
         document.addEventListener('DOMContentLoaded', e => this.onPageLoadedHandler(e));
         document.addEventListener('showSettingsModal', e => this.onShowNeededHandler(e));
+        document.addEventListener('setupNeeded', e => this.onSetupNeedHandler(e))
     }
 
 
@@ -43,6 +43,8 @@ export default class SettingsModal extends Modal{
 
 
     onShowNeededHandler() {
+        this.element.style('display', 'block');
+        this.element.style('opacity', '1');
         this.setupContent()
         this.redraw();
     }
@@ -147,6 +149,12 @@ export default class SettingsModal extends Modal{
                 d3.selectAll('#'+this.DOM_ID).style('display', 'none');
             }, 500);
         });
+    }
+
+    onSetupNeedHandler(e) {
+        this.data = {};
+        this.activePage = 0;
+        this.onShowNeededHandler();
     }
 
     getAllPlotData(){

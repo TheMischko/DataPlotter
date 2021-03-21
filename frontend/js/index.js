@@ -63,3 +63,8 @@ document.addEventListener('setupFinished', (e) => {
     //console.log('setupFinished');
     //console.log(e);
 });
+
+document.addEventListener('setupNeeded', (e) => {
+   //console.log('setupNeeded');
+   //console.log(e);
+});
