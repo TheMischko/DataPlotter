@@ -78,7 +78,10 @@ export default class SettingsModal extends Modal{
     }
 
     leftButtonClicked(e){
-        this.content[this.activePage].jobDone = true;
+        this.activePage--;
+        this.content[this.activePage].resetOutputValue();
+        this.content[this.activePage].jobDone = false;
+        this.redraw();
     }
 
     rightButtonClicked(e){

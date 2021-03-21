@@ -129,14 +129,20 @@ export default class ViewMakerPage extends IModalPage {
 
   getFunctionsHTML() {
     return new Promise(((resolve, reject) => {
-      const options = [
-        'Histogram', 'Klouzavy prumer', 'Funkce 3'
-      ]
-      let html = ""
-      options.forEach((option) => {
-        html += `<option value="${option}">${option}</option>`
+      const SERVER_URL = localStorage.getItem('SERVER_URL');
+      $.ajax({
+        url:  SERVER_URL + '/functions',
+        method: 'GET',
+        success: (res) => {
+          const options = JSON.parse(res);
+          let html = '<option value="">-No function-</option>'
+          options.forEach((option) => {
+            html += `<option value="${option}">${option}</option>`
+          })
+          resolve(html);
+        }
       })
-      resolve(html);
+
     }));
   }
 

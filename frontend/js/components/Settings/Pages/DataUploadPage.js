@@ -71,11 +71,9 @@ export default class DataUploadPage extends IModalPage{
      */
     initFunctions() {
         //Skip this page if environment has File ID already.
-        console.log(this.modal.data);
         if(typeof this.modal.data.file !== "undefined"
           && this.modal.data.file !== null
           && this.modal.data.file !== ""){
-            console.log('skipping Data upload page');
             this.jobDone = true;
             this.file = this.modal.data.file;
             this.modal.forceNextPage();
@@ -168,6 +166,16 @@ export default class DataUploadPage extends IModalPage{
      */
     isAllowedToNext() {
         return this.jobDone
+    }
+
+    /**
+     * Reset output value of the page to stage before any action was done.
+     * Also resets already stored value in modal
+     */
+    resetOutputValue(){
+        console.log('reseting');
+        this.file = null;
+        this.modal.data.file = null;
     }
 
     /**

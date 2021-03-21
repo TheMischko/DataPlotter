@@ -43,6 +43,13 @@ export default class IModalPage{
     }
 
     /**
+     * Reset output value of the page to stage before any action was done.
+     * Also resets already stored value in modal
+     */
+    resetOutputValue(){
+    }
+
+    /**
      * If page needs to return some values to other page of other classes, this function is used.
      * Function is async and returns Promise.
      * @returns dict with key value and value itself
