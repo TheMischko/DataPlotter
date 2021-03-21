@@ -247,9 +247,11 @@ export default class Plot{
         this.data.forEach( (point) => {
             boundaries.maxX = point.x > boundaries.maxX ? point.x : boundaries.maxX;
             boundaries.minX = point.x < boundaries.minX ? point.x : boundaries.minX;
-            boundaries.maxY = point.y > boundaries.maxY ? point.y : boundaries.maxY;
-            boundaries.minY = point.y < boundaries.minY ? point.y : boundaries.minY;
+            boundaries.maxY = point.y > Number(boundaries.maxY) ? point.y : Number(boundaries.maxY);
+            boundaries.minY = point.y < Number(boundaries.minY) ? point.y : Number(boundaries.minY);
         });
+
+        console.log(boundaries);
 
         return boundaries;
     }
