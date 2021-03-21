@@ -5,6 +5,7 @@ export default class IModalPage{
      */
     constructor(modal) {
         this.modal = modal
+        this.jobDone = false;
     }
     /**
      * Returns title of the page.
@@ -32,8 +33,7 @@ export default class IModalPage{
      * @returns {boolean}
      */
     isAllowedToNext(){
-        this.jobDone = false;
-        return this.jobDone
+        return this.jobDone;
     }
 
     /**
@@ -44,12 +44,16 @@ export default class IModalPage{
 
     /**
      * If page needs to return some values to other page of other classes, this function is used.
+     * Function is async and returns Promise.
      * @returns dict with key value and value itself
      */
     returnValue(){
-        return {
-            key: null,
-            value: null
-        }
+        return new Promise(((resolve, reject) => {
+            resolve({
+                key: null,
+                value: null
+            });
+        }))
+
     }
 }

@@ -5,7 +5,23 @@ const viewModel = require('../models/ViewModel');
 
 router.get('/', ((req, res) => {
   const id = req.query.id;
-  if(typeof id === "undefined") {
+  const fileID = req.query.fileID;
+  // If ID is set, return View object with this ID.
+  if(typeof id !== "undefined"){
+    viewModel.getViewByID(id).then(
+      (view) => { res.status(200).send(JSON.stringify(view)) },
+      (err) => { res.status(400).send(err) }
+    )
+  }
+  // If fileID is set, return all Views for this File.
+  else if (typeof fileID !== "undefined"){
+    viewModel.getAllViewsForFile(fileID).then(
+      (views) => { res.status(200).send(JSON.stringify(views)) },
+      (err) => { res.status(400).send(err) }
+    )
+  }
+  // If none is set, return all views.
+  else {
     viewModel.getViews().then(
       (views) => {
         res.status(200).send(JSON.stringify(views))
@@ -13,11 +29,6 @@ router.get('/', ((req, res) => {
       (err) => {
         res.status(400).send(err)
       });
-  } else {
-    viewModel.getViewByID(id).then(
-      (view) => { res.status(200).send(JSON.stringify(view)) },
-      (err) => { res.status(400).send(err) }
-    )
   }
 }));
 

@@ -29,6 +29,21 @@ const getViewByID = (viewID) => {
     View.find({_id: viewID},(err, views) => {
       if(err)
         reject(err);
+      resolve(views[0]);
+    });
+  }));
+}
+
+/**
+ * Gets all views associated with certain File in database.
+ * @param fileID Number - ID of File object in database
+ * @returns {Promise<Object[]>} Resolve in list of Views, reject on error
+ */
+const getAllViewsForFile = (fileID) => {
+  return new Promise(((resolve, reject) => {
+    View.find({fileID: fileID},(err, views) => {
+      if(err)
+        reject(err);
       resolve(views);
     });
   }));
@@ -96,5 +111,6 @@ module.exports = {
   getViewByID: getViewByID,
   addView: addView,
   deleteView: deleteView,
-  editView: editView
+  editView: editView,
+  getAllViewsForFile: getAllViewsForFile
 };

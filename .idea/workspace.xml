@@ -2,14 +2,28 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8b0aa932-f0b3-4b09-a2d5-1f47b76c6532" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/backend/dbSchemas/fileSchema.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/models/FileModel.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/routes/fileRouter.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/css/ViewMakerPage.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/js/components/Settings/Pages/FileSelectPage.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/js/components/Settings/Pages/ViewMakerPage.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/js/components/Settings/Pages/ViewSelectPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/DataPlotter.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/DataPlotter.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.env" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/models/FileModel.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/models/FileModel.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/models/ViewModel.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/models/ViewModel.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/routes/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routes/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/routes/viewRouter.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routes/viewRouter.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/css/modal.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/css/modal.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/js/components/Managers/PlotManager.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/js/components/Managers/PlotManager.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/js/components/Settings/Pages/DataUploadPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/js/components/Settings/Pages/DataUploadPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/js/components/Settings/Pages/IModalPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/js/components/Settings/Pages/IModalPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/js/components/Settings/SettingsModal.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/js/components/Settings/SettingsModal.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/js/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/js/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,8 +34,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="HTML File" />
-        <option value="CSS File" />
         <option value="JavaScript File" />
+        <option value="CSS File" />
       </list>
     </option>
   </component>
@@ -38,7 +52,7 @@
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../API-test" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
@@ -51,7 +65,7 @@
       <recent name="E:\Škola zima 2020\BP\DataPlotter\js\components\Settings" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.start">
+  <component name="RunManager" selected="JavaScript Debug.index.html">
     <configuration name="index.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/DataPlotter/frontend/index.html" useBuiltInWebServerPort="true">
       <method v="2" />
     </configuration>
@@ -95,8 +109,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.start" />
         <item itemvalue="JavaScript Debug.index.html" />
+        <item itemvalue="npm.start" />
       </list>
     </recent_temporary>
   </component>
@@ -138,7 +152,10 @@
       <workItem from="1615988455157" duration="32000" />
       <workItem from="1615989694752" duration="6301000" />
       <workItem from="1616003033435" duration="596000" />
-      <workItem from="1616074316684" duration="9710000" />
+      <workItem from="1616074316684" duration="11933000" />
+      <workItem from="1616177246148" duration="13397000" />
+      <workItem from="1616254416090" duration="22268000" />
+      <workItem from="1616319569937" duration="3566000" />
     </task>
     <servers />
   </component>
@@ -155,10 +172,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="734" y="310" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1040/-1920.82.1920.1040@0.0.1920.1040" timestamp="1615828028064" />
-    <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1615828979340">
+    <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1616266314389">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040/-1920.82.1920.1040@0.0.1920.1040" timestamp="1615828979340" />
+    <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040/-1920.82.1920.1040@0.0.1920.1040" timestamp="1616266314389" />
     <state x="977" y="436" key="#com.intellij.tools.ToolEditorDialog" timestamp="1607688795538">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -167,22 +184,22 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="739" y="274" key="FileChooserDialogImpl/0.0.1920.1040/-1920.82.1920.1040@0.0.1920.1040" timestamp="1616074417690" />
-    <state width="1877" height="275" key="GridCell.Tab.0.bottom" timestamp="1616076841285">
+    <state width="1877" height="283" key="GridCell.Tab.0.bottom" timestamp="1616277798620">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="275" key="GridCell.Tab.0.bottom/0.0.1920.1040/-1920.82.1920.1040@0.0.1920.1040" timestamp="1616076841285" />
-    <state width="1877" height="275" key="GridCell.Tab.0.center" timestamp="1616076841285">
+    <state width="1877" height="283" key="GridCell.Tab.0.bottom/0.0.1920.1040/-1920.82.1920.1040@0.0.1920.1040" timestamp="1616277798620" />
+    <state width="1877" height="283" key="GridCell.Tab.0.center" timestamp="1616277798620">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="275" key="GridCell.Tab.0.center/0.0.1920.1040/-1920.82.1920.1040@0.0.1920.1040" timestamp="1616076841285" />
-    <state width="1877" height="275" key="GridCell.Tab.0.left" timestamp="1616076841285">
+    <state width="1877" height="283" key="GridCell.Tab.0.center/0.0.1920.1040/-1920.82.1920.1040@0.0.1920.1040" timestamp="1616277798620" />
+    <state width="1877" height="283" key="GridCell.Tab.0.left" timestamp="1616277798619">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="275" key="GridCell.Tab.0.left/0.0.1920.1040/-1920.82.1920.1040@0.0.1920.1040" timestamp="1616076841285" />
-    <state width="1877" height="275" key="GridCell.Tab.0.right" timestamp="1616076841285">
+    <state width="1877" height="283" key="GridCell.Tab.0.left/0.0.1920.1040/-1920.82.1920.1040@0.0.1920.1040" timestamp="1616277798619" />
+    <state width="1877" height="283" key="GridCell.Tab.0.right" timestamp="1616277798620">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="275" key="GridCell.Tab.0.right/0.0.1920.1040/-1920.82.1920.1040@0.0.1920.1040" timestamp="1616076841285" />
+    <state width="1877" height="283" key="GridCell.Tab.0.right/0.0.1920.1040/-1920.82.1920.1040@0.0.1920.1040" timestamp="1616277798620" />
     <state x="-1459" y="247" key="SettingsEditor" timestamp="1612520233786">
       <screen x="-1920" y="82" width="1920" height="1040" />
     </state>

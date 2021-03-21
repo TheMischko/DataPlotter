@@ -13,7 +13,7 @@ export default class PlotManager {
    * @param zoomManager Instance of ZoomManager class.
    */
   constructor(wrapperID, zoomManager) {
-    this.numOfPlots = 2;
+    this.numOfPlots = 0;
     this.wrapperID = wrapperID;
     this.init();
     this.csvLoader = new CsvLoader();
@@ -37,14 +37,14 @@ export default class PlotManager {
    */
   onPageLoadedHandler(e) {
     this.wrapperElement = document.getElementById(this.wrapperID);
-    const points = JSON.parse(localStorage.getItem('savedPoints'));
-    const axes = JSON.parse(localStorage.getItem('axes'));
-    if(points !== null && axes !== null){
+    const plotData = JSON.parse(localStorage.getItem("plotData"));
+    if(plotData !== null){
       const onFinishEvent = new CustomEvent('setupFinished');
-      onFinishEvent.settings = points;
       onFinishEvent.fromInit = true;
       document.dispatchEvent(onFinishEvent);
-      this.createPlots(points, axes);
+      plotData.forEach(plot => {
+        this.createPlot(plot)
+      });
     } else {
       const onFinishEvent = new CustomEvent('showSettingsModal');
       document.dispatchEvent(onFinishEvent);
@@ -61,13 +61,9 @@ export default class PlotManager {
   onSetupFinishedHandler(e) {
     if(typeof e.fromInit !== "undefined" && e.fromInit)
       return;
-    const setup = e.settings;
-    const file = setup.files[0];
-    this.csvLoader.readFile(file).then(r => {
-      const data = this.csvLoader.getPointsArray(setup.axes.x, setup.axes.y);
-      localStorage.setItem('savedPoints', JSON.stringify(data));
-      localStorage.setItem('axes', JSON.stringify(setup.axes));
-      this.createPlots(data, setup.axes);
+    const plotData = JSON.parse(localStorage.getItem("plotData"));
+    plotData.forEach(plot => {
+      this.createPlot(plot)
     });
   }
 
@@ -92,5 +88,21 @@ export default class PlotManager {
         group: 1
       });
     }
+  }
+
+  createPlot(data){
+    const id = 'plot-'+this.numOfPlots;
+    const classed = 'plot';
+    d3.select(this.wrapperElement).append('svg')
+      .attr('id', 'wrapper-plot-'+this.numOfPlots)
+      .classed('plot', true);
+    const element = document.getElementById('wrapper-plot-'+this.numOfPlots);
+    new Plot(element, '.'+classed, {
+      zoomManager: this.zoomManager,
+      DOM_ID: id,
+      data: data,
+      group: 1
+    });
+    this.numOfPlots++;
   }
 }

@@ -13,7 +13,8 @@ const mongoose = require('mongoose');
 
 const indexRouter = require('./routes/index');
 const zoomRouter = require('./routes/zoomRouter');
-const viewRouter = require('./routes/viewRouter')
+const viewRouter = require('./routes/viewRouter');
+const fileRouter = require('./routes/fileRouter');
 
 const app = express();
 
@@ -40,7 +41,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors())
 
 app.use('/', indexRouter);
-app.use('/zoom', zoomRouter);
-app.use('/view', viewRouter);
+app.use('/zooms', zoomRouter);
+app.use('/views', viewRouter);
+app.use('/files', fileRouter);
 
 module.exports = app;

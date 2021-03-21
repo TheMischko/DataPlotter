@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 import IModalPage from "./IModalPage";
 import css from "../../../../css/DataUpload.css"
+const $ = require('jquery-ajax');
 
 export default class DataUploadPage extends IModalPage{
 
@@ -8,7 +9,7 @@ export default class DataUploadPage extends IModalPage{
         super(modal);
         this.title = "Provide a file with data"
         this.jobDone = false;
-        this.files = [];
+        this.file = {};
         this.allowedTypes = [
             'application/vnd.ms-excel',
             'text/csv'
@@ -38,7 +39,7 @@ export default class DataUploadPage extends IModalPage{
                 <form draggable="true" class="fileUpload-box" method="post" action="" enctype="multipart/form-data">
                 <div class="fileUpload-input">
                     <i class="fas fa-file-upload"></i>
-                    <input draggable="true" type="file" name="files[]" id="fileUpload"  accept=".csv" multiple>
+                    <input draggable="true" type="file" name="files[]" id="fileUpload"  accept=".csv">
                     <label for="fileUpload">
                         <strong>Choose a file with data</strong>
                         <span class="fileUpload-dragndrop">or drag it here</span>
@@ -69,6 +70,17 @@ export default class DataUploadPage extends IModalPage{
      * Used for inserting JS code in runtime environment
      */
     initFunctions() {
+        //Skip this page if environment has File ID already.
+        console.log(this.modal.data);
+        if(typeof this.modal.data.file !== "undefined"
+          && this.modal.data.file !== null
+          && this.modal.data.file !== ""){
+            console.log('skipping Data upload page');
+            this.jobDone = true;
+            this.file = this.modal.data.file;
+            this.modal.forceNextPage();
+        }
+
         const form = d3.select('.fileUpload-box');
         const input = d3.select('#fileUpload');
 
@@ -91,13 +103,13 @@ export default class DataUploadPage extends IModalPage{
             });
 
             form.on('drop', (e) => {
-                droppedFiles = e.dataTransfer.files;
-                this.parseFiles(droppedFiles);
+                const droppedFile = e.dataTransfer.files[0];
+                this.parseFiles(droppedFile);
             });
 
             input.on('change', (e) => {
-                const files = e.target.files;
-                this.parseFiles(files);
+                const file = e.target.files[0];
+                this.parseFiles(file);
             })
         }
     }
@@ -105,34 +117,48 @@ export default class DataUploadPage extends IModalPage{
 
     /**
      * Validates if files from inputs are valid and shows user correct information.
-     * @param files FileList
+     * @param file FileList
      */
-    parseFiles(files) {
-        if (files.length === 0) {
-            const error = d3.select('.fileUpload-error')
-                .classed('show', true);
-            error.text(error.text().replace('.', 'No files to upload.'));
+    parseFiles(file) {
+        const error = d3.select('.fileUpload-error')
+          .classed('show', false);
+        if (typeof file === "undefined" || file === null) {
+            error.classed('show', true);
+            error.text(error.text().replace('.', 'Error - No files were uploaded, try again.'));
             return;
         }
+        const SERVER_URL = localStorage.getItem("SERVER_URL");
+        const fd = new FormData();
+        fd.append('file', file);
+        $.ajax({
+            url: SERVER_URL + '/files/upload',
+            method: 'POST',
+            data: fd,
+            contentType: false,
+            processData: false,
+            beforeSend: (req) => {
+                req.setRequestHeader('Access-Control-Allow-Origin', SERVER_URL)
+                req.setRequestHeader('Access-Control-Allow-Credentials', 'true')
+            },
+            success: (res) => {
+                const response = JSON.parse(res)
+                console.log('Uploaded');
+                console.log('Got ID: ' + response.id);
 
-        this.files = [];
-        const infoDiv = d3.select('.fileUpload-success').html('Uploaded:');
-        for(let i = 0; i < files.length; i++){
-            if(!(this.allowedTypes.includes(files[i].type))){
-                continue;
-            } else {
-                this.files.push(files[i]);
-                infoDiv.html(infoDiv.html() + '<br />' +files[i].name);
+                const infoDiv = d3.select('.fileUpload-success').html('Uploaded:');
+                infoDiv.html(infoDiv.html() + '<br />' +file.name);
+                this.file = response.id;
+                this.jobDone = true;
+                this.modal.activePageDoneHandler();
+
+                infoDiv.classed('show', true);
+                d3.select('label[for="fileUpload"] > strong').text('Choose a new file again')
+            },
+            error: (res) => {
+                error.classed('show', true);
+                error.text(error.text().replace('.', res));
             }
-        }
-
-        if(this.files.length > 0) {
-            this.jobDone = true;
-            this.modal.activePageDoneHandler();
-
-            infoDiv.classed('show', true);
-            d3.select('label[for="fileUpload"] > strong').text('Choose a new file again')
-        }
+        });
     }
 
 
@@ -149,9 +175,12 @@ export default class DataUploadPage extends IModalPage{
      * @returns
      */
     returnValue(){
-        return {
-            key:    "files",
-            value:  this.files
-        }
+        return new Promise(((resolve, reject) => {
+            resolve({
+                key:    "file",
+                value:  this.file
+            });
+        }))
+
     }
 }

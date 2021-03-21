@@ -7,9 +7,13 @@ import ZoomManager from "./components/Managers/ZoomManager";
 import PlotManager from "./components/Managers/PlotManager";
 import css from "../css/main.css"
 import LeftBar from "./components/LeftBar";
+const $ = require('jquery-ajax');
 
 const zoomManager = new ZoomManager();
 const plotManager = new PlotManager('plots', zoomManager);
+
+const SERVER_URL = 'http://localhost:3000'
+localStorage.setItem('SERVER_URL', SERVER_URL);
 
 const components = [
     {

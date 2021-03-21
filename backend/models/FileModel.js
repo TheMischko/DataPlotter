@@ -54,6 +54,20 @@ const saveCSV = (inFile) => {
 }
 
 /**
+ * Returns all files from database.
+ * @returns {Promise<Object[]>} Resolve in files, reject on error.
+ */
+const getFiles = () => {
+  return new Promise(((resolve, reject) => {
+    File.find((err, files) => {
+      if(err)
+        reject(err);
+      resolve(files);
+    })
+  }));
+}
+
+/**
  * Look for a file under the ID in database and return it.
  * Async function, resolve in file, reject if file not found
  * @param fileID Number - ID of file in database
@@ -100,5 +114,6 @@ const findSimilarFile = (md5, mimetype) => {
 
 module.exports = {
   saveCSV: saveCSV,
-  getFileByID: getFileByID
+  getFileByID: getFileByID,
+  getFiles: getFiles
 }
