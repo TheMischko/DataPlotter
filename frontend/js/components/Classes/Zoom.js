@@ -5,7 +5,7 @@
 export default class Zoom {
   /**
    * Constructor for new Zoom object instance.
-   * @param {number} id
+   * @param {string} id
    * @param {string} name
    * @param {array} zoomSequence
    */

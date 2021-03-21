@@ -18,9 +18,9 @@ const addZoom = (title, sequence, viewID) => {
     })
     zoom.validate().then(
       () => {
-        zoom.save().then(r => {
+        zoom.save().then(zoom => {
           console.log('Saved');
-          resolve();
+          resolve(zoom);
         })
       },
       () => {
@@ -63,8 +63,21 @@ const getZoomsForView = (viewID) => {
   }));
 }
 
+
+const updateZoom = (zoomID, changes) => {
+  return new Promise(((resolve, reject) => {
+    Zoom.findByIdAndUpdate(zoomID, changes, {runValidators: true}, (err, zoom) => {
+      if(err)
+        reject(err);
+      else
+        resolve(zoom);
+    });
+  }))
+}
+
 module.exports = {
   addZoom: addZoom,
   deleteZoom: deleteZoom,
-  getZoomsForView: getZoomsForView
+  getZoomsForView: getZoomsForView,
+  updateZoom: updateZoom
 }

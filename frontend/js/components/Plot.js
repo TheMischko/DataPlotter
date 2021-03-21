@@ -96,9 +96,9 @@ export default class Plot{
         localStorage.setItem('idleTimeout', null)
 
         // A function that set idleTimeOut to null
-        localStorage.setItem('selection', JSON.stringify([0, this.width]));
+        localStorage.setItem('selection', JSON.stringify([0, 1]));
 
-        localStorage.setItem('default-selection', JSON.stringify([0, this.width]));
+        localStorage.setItem('default-selection', JSON.stringify([0, 1]));
 
         localStorage.setItem('activeZoom', null);
 
@@ -112,14 +112,21 @@ export default class Plot{
                 if(typeof(e.sourceEvent) !== 'undefined') {
                     const event = new Event('plotSelectionChanged')
                     event.from = 'mouse';
-                    localStorage.setItem('selection', JSON.stringify(e.selection));
+                    const selection = e.selection !== null
+                      ? [e.selection[0]/(this.width-this.margin.left), e.selection[1]/(this.width-this.margin.left)]
+                      : null;
+                    localStorage.setItem('selection', JSON.stringify(selection));
                     document.dispatchEvent(event);
                 }
             });
 
         document.addEventListener('plotSelectionChanged', (data) => {
             let selection = JSON.parse(localStorage.getItem('selection'));
-            this.updateChart(this, {selection}, true)
+            const sel = selection !== null
+                ? [selection[0]*(this.width-this.margin.left), selection[1]*(this.width-this.margin.left)]
+                : null;
+            console.log(sel);
+            this.updateChart(this, {selection: sel}, true)
         });
 
     }
@@ -292,6 +299,7 @@ export default class Plot{
      */
     updateChart(ref, {selection}, resetSelectionAfter = false ) {
         let extent = selection;
+        console.log(extent);
         let idleTimeout = JSON.parse(localStorage.getItem('idleTimeout'));
 
         // If no selection, back to initial coordinate.

@@ -4,11 +4,12 @@
  * with plot zooms.
  ******************************************************************/
 import Zoom from "../Classes/Zoom";
+const $ = require('jquery-ajax');
+
 export default class ZoomManager {
   constructor() {
     this.ZOOMS_KEY = 'zooms';
-
-    this.init()
+    this.init();
   }
 
 
@@ -47,7 +48,7 @@ export default class ZoomManager {
    * Gets all zooms saved in storage.
    * @returns {Zoom[]}
    */
-  getAllZooms() {
+  getAllZoomsLocal() {
     const zooms = JSON.parse(localStorage.getItem(this.ZOOMS_KEY));
     if(typeof(zooms) === 'undefined' || zooms === null){
       localStorage.setItem('selection', JSON.stringify('[]'));
@@ -58,7 +59,29 @@ export default class ZoomManager {
   }
 
   /**
-   * Gets sequence of zooms for current view.
+   * Gets all zooms from database.
+   * @return {Promise<Object[]>}
+   */
+  getAllZooms() {
+    return new Promise(((resolve, reject) => {
+      const SERVER_URL = localStorage.getItem('SERVER_URL');
+      const viewID = localStorage.getItem('viewID');
+      $.ajax({
+        url:  SERVER_URL + '/zooms?viewID=' + viewID,
+        method: 'GET',
+        success: (res) => {
+          const zooms = JSON.parse(res);
+          resolve(zooms.map((zoom => {return new Zoom(zoom._id, zoom.title, zoom.zoomSequence)})));
+        },
+        error: (res) => {
+          reject(res);
+        }
+      })
+    }));
+  }
+
+  /**
+   * Gets sequence of zooms for current main zoom.
    * @returns {*[]}
    */
   getCurrentZoomPath() {
@@ -71,34 +94,59 @@ export default class ZoomManager {
     }
   }
 
+  setLocalZooms(zooms){
+    localStorage.setItem(this.ZOOMS_KEY, JSON.stringify(zooms));
+  }
+
   /**
-   * Saves zoom sequence into storage.
+   * Saves zoom sequence into database.
    * @param {*[]}zoomSequence
    * @param {string}name
-   * @returns {number} ID of zoom in storage.
+   * @return Promise{Object} Resolve in View object from storage, reject on error.
    */
   addNewZoom(zoomSequence, name = '') {
-    const zooms = this.getAllZooms();
-    let newIndex = -1;
-    if(zooms.length === 0)
-      newIndex = 0
-    else
-      // Gets index of last zoom and adds one to it
-      newIndex = zooms[zooms.length - 1].id + 1;
+    return new Promise(((resolve, reject) => {
+      const SERVER_URL = localStorage.getItem('SERVER_URL');
+      const viewID = localStorage.getItem('viewID');
+      $.ajax({
+        url:  SERVER_URL + '/zooms/add',
+        method: 'POST',
+        data: {
+          title: name,
+          viewID: viewID,
+          sequence: JSON.stringify(zoomSequence)
+        },
+        success: (res) => {
+          const resParsed = JSON.parse(res);
+          const zoom = new Zoom(resParsed._id, resParsed.title, resParsed.zoomSequence);
+          this.saveZoomLocal(zoom);
+          resolve(JSON.parse(res));
+        },
+        error: (res) => {
+          reject(res);
+        }
+      })
+    }))
+  }
 
-    zooms.push(new Zoom(newIndex, name, zoomSequence));
-    localStorage.setItem(this.ZOOMS_KEY, JSON.stringify(zooms));
-    return newIndex;
+  /**
+   * Saves Zoom object to storage.
+   * @param zoom
+   */
+  saveZoomLocal(zoom) {
+    const zooms = JSON.parse(localStorage.getItem('zooms'));
+    zooms.push(zoom);
+    localStorage.setItem('zooms', JSON.stringify(zooms));
   }
 
   /**
    * Returns Zoom with corresponding ID.
-   * @param {Number}id
+   * @param {string}id
    * @returns Zoom
    * @throws Error when zoom was not found
    */
   getZoomByID(id){
-    const zooms = this.getAllZooms();
+    const zooms = this.getAllZoomsLocal();
     for(let i = 0; i<zooms.length; i++){
       if(zooms[i].id === id)
         return zooms[i];
@@ -113,41 +161,88 @@ export default class ZoomManager {
    * @param {*[]} zoomSequence
    */
   updateZoom(id, {name= '', zoomSequence= null}){
-    const zooms = this.getAllZooms();
-    zooms.forEach(zoom => {
-      if(zoom.id === id)
-        if(typeof name !== 'undefined')
-          zoom.name = name;
-        if(zoomSequence !== null && typeof zoomSequence !== 'undefined')
-          zoom.zoomSequence = zoomSequence;
-    });
-    localStorage.setItem(this.ZOOMS_KEY, JSON.stringify(zooms));
+    return new Promise(((resolve, reject) => {
+      const SERVER_URL = localStorage.getItem('SERVER_URL');
+      const viewID = localStorage.getItem('viewID');
+      const data= {
+        zoomID: id,
+        viewID: viewID,
+        title: name,
+        zoomSequence: JSON.stringify(zoomSequence)
+      };
+      $.ajax({
+        url:  SERVER_URL + '/zooms/update',
+        method: 'POST',
+        data: {
+          zoomID: id,
+          viewID: viewID,
+          title: name,
+          zoomSequence: JSON.stringify(zoomSequence)
+        },
+        success: (res) => {
+          const parsedRes = JSON.parse(res);
+          const zooms = this.getAllZoomsLocal();
+          zooms.forEach(zoom => {
+            if(zoom.id === parsedRes._id){
+              zoom.name = parsedRes.title;
+              zoom.zoomSequence = parsedRes.zoomSequence;
+            }
+          });
+          localStorage.setItem(this.ZOOMS_KEY, JSON.stringify(zooms));
+          resolve(parsedRes);
+        },
+        error: (res) => {
+          reject(res)
+        }
+      })
+    }));
   }
 
   /**
    * Deletes zoom with corresponding ID from storage.
-   * @param {number}id
+   * @param {string}id
    */
   deleteZoom(id){
-    const zooms = this.getAllZooms();
-    zooms.forEach(zoom => {
-      if(zoom.id === id) {
-        const deleteIndex = zooms.indexOf(zoom);
-        zooms.splice(deleteIndex, 1);
-      }
-    });
-    localStorage.setItem(this.ZOOMS_KEY, JSON.stringify(zooms));
+    return new Promise(((resolve, reject) => {
+      const SERVER_URL = localStorage.getItem('SERVER_URL');
+      $.ajax({
+        url: SERVER_URL + "/zooms/delete",
+        method: "POST",
+        data: {
+          id: id
+        },
+        success: (res) => {
+          const zooms = this.getAllZoomsLocal();
+          zooms.forEach(zoom => {
+            if(zoom.id === id) {
+              const deleteIndex = zooms.indexOf(zoom);
+              zooms.splice(deleteIndex, 1);
+            }
+          });
+          localStorage.setItem(this.ZOOMS_KEY, JSON.stringify(zooms));
+          resolve(JSON.parse(res));
+        },
+        error: (res) => {
+          reject(res);
+        }
+      })
+    }));
   }
 
 
   /**
-   * Used for saving current zoom sequence into localStorage.
-   * @returns {number} index of the sequence in storage
+   * Used for saving current zoom sequence into storage.
+   * @returns Promise{Object} Zoom object from database
    */
   saveCurrentZoom() {
-    console.log('Saving current zoom.');
-    const zoomPath = this.getCurrentZoomPath();
-    return this.addNewZoom(zoomPath);
+    return new Promise(((resolve, reject) => {
+
+      const zoomPath = this.getCurrentZoomPath();
+      this.addNewZoom(zoomPath).then((zoom) => {
+        resolve(zoom)
+      }, (err) => {reject(err)});
+    }))
+
   }
 
 

@@ -15,6 +15,18 @@ export default class ZoomsTile {
     parent.append('h1')
       .text('Saved zooms:');
 
+    document.addEventListener('setupFinished', (e) => {
+      this.zoomManager.getAllZooms().then((zooms) => {
+        this.zoomManager.setLocalZooms(zooms);
+        for(let i = 0; i < zooms.length; i++){
+          const name = zooms[i].name === ''
+            ? 'Zoom'+zooms[i].id
+            : zooms[i].name
+          this.appendZoomButton(parent, zooms[i].id, name, false);
+        }
+      });
+    });
+
     parent.append('button')
       .attr('id', 'add-zoom')
       .html('<i class="fas fa-plus"></i>&nbsp;Save current zoom')
@@ -22,14 +34,6 @@ export default class ZoomsTile {
       .on('click', (e) => {
         this.addZoomClicked(e);
       });
-
-    const zooms = this.zoomManager.getAllZooms();
-    for(let i = 0; i < zooms.length; i++){
-      const name = zooms[i].name === ''
-        ? 'Zoom'+zooms[i].id
-        : zooms[i].name
-      this.appendZoomButton(parent, zooms[i].id, name, false);
-    }
   }
 
 
@@ -59,9 +63,11 @@ export default class ZoomsTile {
    * @param e Event
    */
   addZoomClicked(e) {
-    const newIndex = this.zoomManager.saveCurrentZoom();
-    const parent = d3.select(e.target.parentNode);
-    this.appendZoomButton(parent, newIndex, '', true);
+    const newIndex = this.zoomManager.saveCurrentZoom().then((zoom) => {
+      const parent = d3.select(e.target.parentNode);
+      this.appendZoomButton(parent, zoom._id, '', true);
+    });
+
   }
 
   /**
@@ -69,12 +75,11 @@ export default class ZoomsTile {
    * @param e
    */
   savedZoomButtonClicked(e) {
-    console.log('single click');
     let target = e.target;
     while(target.tagName !== 'BUTTON'){
       target = target.parentNode;
     }
-    const zoomID = Number(target.getAttribute('zoom-id'));
+    const zoomID = target.getAttribute('zoom-id');
     const zoomSequence = this.zoomManager.getZoomByID(zoomID).zoomSequence;
     if(target.classList.contains('deleteMode')){
       this.savedZoomButtonDeleteClicked(target, zoomID);
@@ -102,7 +107,7 @@ export default class ZoomsTile {
     if(target.classList.contains('deleteReady')){
       d3.select(target)
         .remove();
-      this.zoomManager.deleteZoom(zoomID);
+      this.zoomManager.deleteZoom(zoomID).then();
     } else {
       d3.select(target)
         .classed('danger', false)
@@ -150,7 +155,9 @@ export default class ZoomsTile {
       .style('display', 'none');
     d3.select(e.target.parentNode)
       .attr('name', nameVal);
-    this.zoomManager.updateZoom(Number(e.target.getAttribute('zoom-id')), {name: nameVal});
+    this.zoomManager.updateZoom(
+      e.target.getAttribute('zoom-id'),
+      {name: nameVal}).then();
   }
 
 
