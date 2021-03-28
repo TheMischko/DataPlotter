@@ -21,7 +21,7 @@ https://tympanus.net/codrops/2015/09/15/styling-customizing-file-inputs-smart-wa
     align-items: center;
     margin: 20px auto;
     width: 80%;
-    height: 300px;
+    height: 200px;
     border-radius: 5px;
     background: #eeeeee;
     color: #888888;
@@ -53,4 +53,25 @@ label[for="fileUpload"] > strong:hover{
 }
 .fileUpload-success{
     color: #2d8856;
+}
+#fileNameRow{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+#fileNameRow.hidden{
+    opacity: 0;
+    cursor: default;
+}
+#fileNameRow.hidden > #fileName:hover{
+    cursor: default;
+}
+input[type=text]{
+    padding: 5px;
+    border-radius: 5px;
+    width: 60%;
+    margin-left: 10px;
+    font-size: 18px;
 }

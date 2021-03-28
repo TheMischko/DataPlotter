@@ -140,5 +140,6 @@ module.exports = {
   saveCSV: saveCSV,
   getFileByID: getFileByID,
   getFiles: getFiles,
-  deleteFile: deleteFile
+  deleteFile: deleteFile,
+  changeNickname: changeNickname
 }

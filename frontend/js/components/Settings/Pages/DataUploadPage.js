@@ -9,7 +9,7 @@ export default class DataUploadPage extends IModalPage{
         super(modal);
         this.title = "Provide a file with data"
         this.jobDone = false;
-        this.file = {};
+        this.file = null;
         this.allowedTypes = [
             'application/vnd.ms-excel',
             'text/csv'
@@ -50,6 +50,10 @@ export default class DataUploadPage extends IModalPage{
                  <div class="fileUpload-success fileUpload-message"></div>
                  <div class="fileUpload-error fileUpload-message">Error! <span></span>.</div>
                 </form>
+                <div id="fileNameRow" class="hidden">
+                    <label for="fileName">Name the file:</label>
+                    <input type="text" id="fileName" />
+                </div>
                 `;
             resolve(html);
         }));
@@ -99,17 +103,23 @@ export default class DataUploadPage extends IModalPage{
             form.on('dragleave dragend drop', (e) => {
                 form.classed('is-dragover', false);
             });
-
-            form.on('drop', (e) => {
-                const droppedFile = e.dataTransfer.files[0];
-                this.parseFiles(droppedFile);
-            });
-
-            input.on('change', (e) => {
-                const file = e.target.files[0];
-                this.parseFiles(file);
-            })
         }
+
+        form.on('drop', (e) => {
+            const droppedFile = e.dataTransfer.files[0];
+            this.parseFiles(droppedFile);
+        });
+
+        input.on('change', (e) => {
+            const file = e.target.files[0];
+            this.parseFiles(file);
+        });
+
+
+        d3.select('#fileName')
+          .on('change', (e) => this.handleNameChange(e))
+          .on('keyup', (e) => this.handleNameChange(e))
+          .on('blur', (e) => this.setFileName(e));
     }
 
 
@@ -140,20 +150,19 @@ export default class DataUploadPage extends IModalPage{
             },
             success: (res) => {
                 const response = JSON.parse(res)
-                console.log('Uploaded');
-                console.log('Got ID: ' + response.id);
 
                 const infoDiv = d3.select('.fileUpload-success').html('Uploaded:');
                 infoDiv.html(infoDiv.html() + '<br />' +file.name);
                 this.file = response.id;
-                this.jobDone = true;
-                this.modal.activePageDoneHandler();
 
                 infoDiv.classed('show', true);
-                d3.select('label[for="fileUpload"] > strong').text('Choose a new file again')
+                d3.select('label[for="fileUpload"] > strong').text('Choose a new file again');
+
+                d3.select('#fileNameRow').classed("hidden", false);
             },
             error: (res) => {
                 error.classed('show', true);
+                d3.select('#fileNameRow').classed("hidden", true);
                 error.text(error.text().replace('.', res));
             }
         });
@@ -173,9 +182,50 @@ export default class DataUploadPage extends IModalPage{
      * Also resets already stored value in modal
      */
     resetOutputValue(){
-        console.log('reseting');
         this.file = null;
         this.modal.data.file = null;
+    }
+
+    /**
+     * Called when value of name input is changed.
+     * @param e
+     */
+    handleNameChange(e){
+        const value = e.target.value;
+        if(value === ""){
+            this.jobDone = false;
+        }
+        if(this.file !== null && this.file.length > 0){
+            this.jobDone = true;
+            this.modal.activePageDoneHandler();
+        }
+    }
+
+
+    /**
+     * Send request to API to change nickname of a single file.
+     * File has to be saved in this.file attribute and name in e.target.value attribute.
+     * @param e Event
+     */
+    setFileName(e){
+        const value = e.target.value;
+        if(value.length > 0 && this.file != null){
+            const SERVER_URL = localStorage.getItem("SERVER_URL");
+            $.ajax({
+                url: SERVER_URL + "/files/rename",
+                method: 'POST',
+                data: {
+                    fileID: this.file,
+                    nickname: value
+                },
+                success: (res) => {
+                    console.log(res);
+                },
+                error: (res) => {
+                    console.error(res);
+                }
+            })
+        }
     }
 
     /**

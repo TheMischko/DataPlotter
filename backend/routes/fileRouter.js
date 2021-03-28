@@ -52,22 +52,32 @@ router.post('/delete', ((req, res) => {
     res.status("400").send("Bad file ID.");
   fileModel.deleteFile(fileID).then(
     async () => {
-      console.log("Deleting file: " + fileID);
       const views = await viewModel.getAllViewsForFile(fileID);
       for (const view of views) {
-        console.log("Deleting view: " + view._id);
         await viewModel.deleteView(view._id);
         const zooms = await zoomModel.getZoomsForView(view._id);
         for (const zoom of zooms) {
-          console.log("Deleting zoom: " + zoom._id);
           await zoomModel.deleteZoom(zoom._id);
         }
+        res.status(200).send('Deleted');
       }
-
-      res.status(200).send('Deleted');
       },
     (err) => { res.status(400).send(err); }
   )
 }));
+
+
+router.post('/rename', (((req, res) => {
+  const fileID = req.body.fileID;
+  const name = req.body.nickname;
+  if((typeof fileID === "undefined" || typeof name === "undefined")
+    || (fileID.length === 0 || name.length === 0)){
+    res.status(400).send("ID or name is invalid");
+  }
+  fileModel.changeNickname(fileID, name).then(
+    () => res.status(200).send("Renamed."),
+    (err) => res.status(400).send(err)
+  );
+})));
 
 module.exports = router;
