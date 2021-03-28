@@ -88,6 +88,11 @@ export default class FileSelectPagePage extends IModalPage{
           <div>${file.nickname}</div>
           <div>${new Date(file.created_at).toLocaleDateString()}</div>
           `)
+          .append("button")
+            .classed('deleteButton', true)
+            .html("<i class=\"fas fa-times\"></i>")
+            .on("click", (e) => this.deleteButtonClick(e))
+
       })
     })
   }
@@ -98,7 +103,11 @@ export default class FileSelectPagePage extends IModalPage{
    */
   fileTileClickHandler(e) {
     let target = e.target;
+    if(typeof target === "undefined" || target === null)
+      return;
     while(!target.classList.contains("tile")){
+      if(target.tagName === "BUTTON")
+        return;
       target = target.parentNode;
     }
     d3.selectAll('#fileSelectPage .tile').classed('selected', false);
@@ -107,6 +116,38 @@ export default class FileSelectPagePage extends IModalPage{
     this.jobDone = true;
     this.file = fileID;
     this.modal.activePageDoneHandler();
+  }
+
+  deleteButtonClick(e) {
+    let target = e.target.tagName === "BUTTON" ? e.target : e.target.parentNode;
+    const fileID = target.parentNode.getAttribute("file-id");
+    if(typeof fileID === "undefined" || fileID === "")
+      return;
+
+    if(target.classList.contains("clicked")){
+      target.parentNode.parentNode.removeChild(target.parentNode);
+      const SERVER_URL = localStorage.getItem('SERVER_URL');
+      $.ajax({
+        url: SERVER_URL + '/files/delete',
+        method: 'POST',
+        data: {
+          fileID: fileID
+        },
+        success: (res) => {
+          console.log(res);
+        },
+        error: (res) => {
+          console.log(res);
+        }
+      });
+    } else {
+      target.classList.add("clicked");
+      target.innerHTML = "Confirm";
+      setTimeout(()=>{
+        target.innerHTML = "<i class=\"fas fa-times\"></i>";
+        target.classList.remove("clicked");
+      }, 3000);
+    }
   }
 
   uploadButtonClick(e) {

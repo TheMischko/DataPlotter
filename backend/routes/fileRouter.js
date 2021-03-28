@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const fileModel = require('../models/FileModel');
+const viewModel = require('../models/ViewModel');
+const zoomModel = require('../models/ZoomModel');
 
 
 router.get('/', ((req, res) => {
@@ -42,5 +44,30 @@ router.post('/upload', function(req, res, next) {
       });
   }
 });
+
+
+router.post('/delete', ((req, res) => {
+  const fileID = req.body.fileID;
+  if(typeof fileID === "undefined" || fileID === "")
+    res.status("400").send("Bad file ID.");
+  fileModel.deleteFile(fileID).then(
+    async () => {
+      console.log("Deleting file: " + fileID);
+      const views = await viewModel.getAllViewsForFile(fileID);
+      for (const view of views) {
+        console.log("Deleting view: " + view._id);
+        await viewModel.deleteView(view._id);
+        const zooms = await zoomModel.getZoomsForView(view._id);
+        for (const zoom of zooms) {
+          console.log("Deleting zoom: " + zoom._id);
+          await zoomModel.deleteZoom(zoom._id);
+        }
+      }
+
+      res.status(200).send('Deleted');
+      },
+    (err) => { res.status(400).send(err); }
+  )
+}));
 
 module.exports = router;

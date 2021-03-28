@@ -108,12 +108,37 @@ const findSimilarFile = (md5, mimetype) => {
           reject()
       });
   }))
+}
 
+
+const deleteFile = (fileID) => {
+  return new Promise(((resolve, reject) => {
+    resolve();
+    File.findOneAndDelete({_id: fileID}, (err, file) => {
+      if(err)
+        reject(err);
+      else
+        resolve();
+    })
+  }))
+}
+
+
+const changeNickname = (fileID, nickname) => {
+  return new Promise(((resolve, reject) => {
+    File.findOneAndUpdate({_id: fileID}, {nickname: nickname}, (err, file) => {
+      if(err)
+        reject(err);
+      else
+        resolve();
+    })
+  }));
 }
 
 
 module.exports = {
   saveCSV: saveCSV,
   getFileByID: getFileByID,
-  getFiles: getFiles
+  getFiles: getFiles,
+  deleteFile: deleteFile
 }

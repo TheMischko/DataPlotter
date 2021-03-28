@@ -218,7 +218,11 @@ export default class SettingsModal extends Modal{
                     req.setRequestHeader('Access-Control-Allow-Credentials', 'true')
                 },
                 success: (res) => {
-                    resolve(JSON.parse(res));
+                    const res_parsed = JSON.parse(res);
+                    res_parsed.forEach((tuple) => {
+                        tuple.y = Number(tuple.y);
+                    })
+                    resolve(res_parsed);
                 },
                 error: (res) => {
                     reject(res);

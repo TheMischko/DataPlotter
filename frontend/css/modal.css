@@ -223,6 +223,20 @@
     margin-bottom: 10px;
 }
 
+.tile-wrapper .tile .deleteButton{
+    position: relative;
+    display: flex;
+    bottom: 80%;
+    left: 40%;
+    z-index: 10;
+    padding: 8px;
+    align-items: center;
+    background-color: #ff253a;
+}
+.tile-wrapper .tile .deleteButton.clicked{
+    left: 25%;
+}
+
 
 @media only screen and (min-width: 500px) {
     .header-content > h1, .header-exit > h1{

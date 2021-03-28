@@ -37,9 +37,9 @@ const getValueTuples = (filename, xValue, yValue) => {
           data[scale] = scales[scale](i);
         })
         i++;
-        if(typeof data[xValue] === 'undefined' || typeof data[yValue] === 'undefined')
+        if(typeof data[xValue] === 'undefined' && typeof data[yValue] === 'undefined')
           reject();
-        values.push({x: data[xValue], y: data[yValue]});
+        values.push({x: Number(data[xValue]), y: Number(data[yValue])});
 
       })
       .on('end', () => {

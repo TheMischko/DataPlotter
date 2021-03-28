@@ -14,7 +14,6 @@ router.get('/values', ((req, res) => {
   const x_value = typeof req.query['x_value'] === "undefined" ? 'linear scale' : req.query['x_value'];
   const y_value = typeof req.query['y_value'] === "undefined" ? 'linear scale' : req.query['y_value'];
   const func = req.query['func'];
-  console.log(func);
 
   if(typeof csvID === "undefined" || (req.query['x_value'] === "undefined" && req.query['y_value'] === "undefined"))
     res.status(400).send('Bad request.')
