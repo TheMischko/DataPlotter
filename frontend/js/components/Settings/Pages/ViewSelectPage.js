@@ -89,7 +89,11 @@ export default class ViewSelectPage extends IModalPage{
           .html(`
           <i class="fas fa-chart-line"></i>
           <div>${viewName}</div>
-          `)
+          <div><br/></div>`)
+          .append("button")
+            .classed('deleteButton', true)
+            .html("<i class=\"fas fa-times\"></i>")
+            .on("click", (e) => this.deleteButtonClick(e));
       })
     })
   }
@@ -101,6 +105,10 @@ export default class ViewSelectPage extends IModalPage{
   viewTileClickHandler(e) {
     let target = e.target;
     while(!target.classList.contains("tile")){
+      if(target.tagName === "BUTTON")
+        return;
+      if(target.parentNode === null)
+        return;
       target = target.parentNode;
     }
     d3.selectAll('#viewWrapper .tile').classed('selected', false);
@@ -115,6 +123,37 @@ export default class ViewSelectPage extends IModalPage{
     this.view = null;
     this.jobDone = true;
     this.modal.forceNextPage();
+  }
+
+  deleteButtonClick(e) {
+    let target = e.target.tagName === "BUTTON" ? e.target : e.target.parentNode;
+    let viewID = target.parentNode.getAttribute("view-id");
+    if(typeof viewID === "undefined" || viewID === null)
+      return;
+
+    if(target.classList.contains("clicked")){
+      const SERVER_URL = localStorage.getItem('SERVER_URL');
+      $.ajax({
+        url: SERVER_URL + "/views/delete",
+        method: "POST",
+        data: {
+          id: viewID
+        },
+        success: (res) => {
+          target.parentNode.parentNode.removeChild(target.parentNode);
+        },
+        error: (res) => {
+          console.error(res);
+        }
+      })
+    } else {
+      target.classList.add("clicked");
+      target.innerHTML = "Confirm";
+      setTimeout(()=>{
+        target.innerHTML = "<i class=\"fas fa-times\"></i>";
+        target.classList.remove("clicked");
+      }, 3000);
+    }
   }
 
   /**

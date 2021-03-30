@@ -91,7 +91,7 @@ export default class FileSelectPagePage extends IModalPage{
           .append("button")
             .classed('deleteButton', true)
             .html("<i class=\"fas fa-times\"></i>")
-            .on("click", (e) => this.deleteButtonClick(e))
+            .on("click", (e) => this.deleteButtonClick(e));
 
       })
     })
@@ -125,7 +125,7 @@ export default class FileSelectPagePage extends IModalPage{
       return;
 
     if(target.classList.contains("clicked")){
-      target.parentNode.parentNode.removeChild(target.parentNode);
+
       const SERVER_URL = localStorage.getItem('SERVER_URL');
       $.ajax({
         url: SERVER_URL + '/files/delete',
@@ -134,10 +134,10 @@ export default class FileSelectPagePage extends IModalPage{
           fileID: fileID
         },
         success: (res) => {
-          console.log(res);
+          target.parentNode.parentNode.removeChild(target.parentNode);
         },
         error: (res) => {
-          console.log(res);
+          console.error(res);
         }
       });
     } else {
