@@ -11,7 +11,19 @@ export default class Plot{
         this.selector = selector;
         this.options = options;
         this.zoomManager = options.zoomManager;
-        this.data = options.data;
+        this.data = [{ points: options.data, courseID: 0, color: "#3cb371"}];
+        const augmented_graph = []
+        options.data.forEach((point) => {
+            augmented_graph.push({x: point.x, y: point.y/2});
+        })
+        this.data.push({points: augmented_graph, courseID: 1, color: "#2158fe"})
+        console.log(this.data);
+
+        this.lineFunctions = {};
+        this.lineGraphs = {};
+        this.points = {};
+        this.tooltips = {};
+
         this.group = options.group;
         this.parent = d3.select(this.element.parentNode);
 
@@ -59,6 +71,9 @@ export default class Plot{
             .attr("transform",
                 "translate("+this.margin.left+","+this.margin.top+")")
             .on("mousemove", (e) => {
+                if(e.target.tagName === "circle"){
+                    console.log(e.target.getAttribute("courseID"))
+                }
                 const event = new MouseEvent('plotMouseOver', e)
                 event.group = this.group;
                 event.sourcePlot = this.element;
@@ -75,11 +90,17 @@ export default class Plot{
             this.showMouseTooltip(e);
         })
 
-        // Tooltip div
-        this.tooltip = d3.select(document.body)
-            .append('div')
-            .attr('class', 'tooltip')
-            .style('opacity', 0)
+        // Tooltip divs
+        this.data.forEach((course) => {
+            this.tooltips[course.courseID] = d3.select(document.body)
+              .append('div')
+              .attr('class', 'tooltip')
+              .attr('plotID', this.DOM_id.split("wrapper-plot-")[0])
+              .attr('courseID', course.courseID)
+              .style('opacity', 0)
+        })
+
+
 
         // Add clipPath - everything out of this area won't be drawn.
         this.clipId = "clip-"+Date.now();
@@ -125,7 +146,6 @@ export default class Plot{
             const sel = selection !== null
                 ? [selection[0]*(this.width-this.margin.left), selection[1]*(this.width-this.margin.left)]
                 : null;
-            console.log(sel);
             this.updateChart(this, {selection: sel}, true)
         });
 
@@ -197,45 +217,53 @@ export default class Plot{
             .attr('style', "stroke:rgb(255,0,0);stroke-width:2")
         // Line
         this.lineFunction = d3.line()
-            .x((data) => {
-                return this.xScale(data.x);
-            })
-            .y((data) => {
-                return this.yScale(data.y);
-            })
-            .curve(d3.curveNatural);
+          .x((data) => {
+              return this.xScale(data.x);
+          })
+          .y((data) => {
+              return this.yScale(data.y);
+          })
+          .curve(d3.curveNatural);
 
-        this.lineGraph = this.svg.append("g")
-            .attr("clip-path", "url(#"+this.clipId+")");
-        this.lineGraph
-            .append('path')
-            .attr('id', 'lineGraph-path')
-            .attr('class', 'curve')
-            .attr('d', this.lineFunction(this.data));
-        // Points
-        this.points = this.svg.append("g")
-            .attr("clip-path", "url(#"+this.clipId+")");
-        // Add the brushing
-        this.points
-            .append('g')
-            .attr('class', 'brush')
-            .call(this.brush)
+        this.data.forEach((course) => {
 
-        this.points
-            .selectAll('.dot')
-            .data(this.data)
-            .enter()
-            .append('circle')
-            .classed('dot', true)
-            .attr('r', 3)
-            .attr('cx', (data) => this.xScale(data.x))
-            .attr('cy', (data) => this.yScale(data.y))
-            .on("mouseover", (e, data) => {
-                this.pointsMouseOver(e, data);
-            })
-            .on("mouseout", (e, i) => {
-                this.pointsMouseOut(e, i);
-            })
+            this.lineGraphs[course.courseID] = this.svg.append("g")
+              .attr("clip-path", "url(#"+this.clipId+")");
+
+            this.lineGraphs[course.courseID]
+              .append('path')
+              .attr('id', 'lineGraph-path')
+              .attr('class', 'curve')
+              .attr('d', this.lineFunction(course.points))
+              .attr('style', `stroke:${course.color};`);
+
+            // Points
+            this.points[course.courseID] = this.svg.append("g")
+              .attr("clip-path", "url(#"+this.clipId+")");
+
+            // Add the brushing
+            this.points[course.courseID]
+              .append('g')
+              .attr('class', 'brush')
+              .call(this.brush)
+            /*
+            this.points[course.courseID]
+              .selectAll('.dot')
+              .data(course.points)
+              .enter()
+              .append('circle')
+              .classed('dot', true)
+              .attr('courseID', course.courseID)
+              .attr('r', 3)
+              .attr('cx', (data) => this.xScale(data.x))
+              .attr('cy', (data) => this.yScale(data.y))
+              .on("mouseover", (e, data) => {
+                  this.pointsMouseOver(e, data);
+              })
+              .on("mouseout", (e, i) => {
+                  this.pointsMouseOut(e, i);
+              });*/
+        })
     }
 
 
@@ -251,15 +279,14 @@ export default class Plot{
             'maxY': Number.MIN_SAFE_INTEGER
         }
 
-        this.data.forEach( (point) => {
-            boundaries.maxX = point.x > boundaries.maxX ? point.x : boundaries.maxX;
-            boundaries.minX = point.x < boundaries.minX ? point.x : boundaries.minX;
-            boundaries.maxY = point.y > Number(boundaries.maxY) ? point.y : Number(boundaries.maxY);
-            boundaries.minY = point.y < Number(boundaries.minY) ? point.y : Number(boundaries.minY);
+        this.data.forEach( (course) => {
+            course.points.forEach(point => {
+                boundaries.maxX = point.x > boundaries.maxX ? point.x : boundaries.maxX;
+                boundaries.minX = point.x < boundaries.minX ? point.x : boundaries.minX;
+                boundaries.maxY = point.y > Number(boundaries.maxY) ? point.y : Number(boundaries.maxY);
+                boundaries.minY = point.y < Number(boundaries.minY) ? point.y : Number(boundaries.minY);
+            });
         });
-
-        console.log(boundaries);
-
         return boundaries;
     }
 
@@ -299,7 +326,6 @@ export default class Plot{
      */
     updateChart(ref, {selection}, resetSelectionAfter = false ) {
         let extent = selection;
-        console.log(extent);
         let idleTimeout = JSON.parse(localStorage.getItem('idleTimeout'));
 
         // If no selection, back to initial coordinate.
@@ -313,8 +339,11 @@ export default class Plot{
         } else {
             ref.xScale.domain([ ref.xScale.invert(extent[0]), ref.xScale.invert(extent[1]) ]);
             // This removes the grey brush area as soon as the selection has been done
-            ref.points.select('.brush').call(ref.brush.move, null);
+            ref.data.forEach((course) => {
+                ref.points[course.courseID].select('.brush').call(ref.brush.move, null);
+            })
         }
+
 
         //Update axis and circle position
         ref.xAxis
@@ -329,71 +358,85 @@ export default class Plot{
                 .tickFormat(""));
 
         this.lineFunction = d3.line()
-            .x((data) => {
-                return ref.xScale(data.x);
-            })
-            .y((data) => {
-                return ref.yScale(data.y);
-            })
-            .curve(d3.curveNatural);
+              .x((data) => {
+                  return ref.xScale(data.x);
+              })
+              .y((data) => {
+                  return ref.yScale(data.y);
+              })
+              .curve(d3.curveNatural);
 
-        ref.lineGraph
-            .selectAll('path')
-            .transition()
-            .duration(200)
-            .attr('d', this.lineFunction(this.data));
+        this.data.forEach((course) => {
+            const lineGraph = ref.lineGraphs[course.courseID];
+            lineGraph
+              .selectAll('path')
+              .transition()
+              .duration(200)
+              .attr('d', this.lineFunction(course.points));
 
-        ref.points
-            .selectAll('.dot')
-            .transition()
-            .duration(200)
-            .attr('cx', (data) => ref.xScale(data.x))
-            .attr('cy', (data) => ref.yScale(data.y))
+            const points = ref.points[course.courseID];
+            points
+              .selectAll('.dot')
+              .transition()
+              .duration(200)
+              .attr('cx', (data) => ref.xScale(course.points.x))
+              .attr('cy', (data) => ref.yScale(course.points.y))
+
+        });
     }
 
 
     pointsMouseOver(e, data) {
+        /*
         d3.select(e.target).transition()
             .duration('100')
-            .attr("r", 5);
+            .attr("r", 5);*/
         /*
         this.tooltip.transition()
             .duration('100')
             .style('opacity', 1);
         this.tooltip.html('['+data.x+'; '+data.y+']')
             .style('left', (e.pageX + 10) + "px")
-            .style('top', (e.pageY - 15) + "px")
-
-         */
+            .style('top', (e.pageY - 15) + "px")*/
     }
 
 
     pointsMouseOut(e, i) {
+        /*
         d3.select(e.target).transition()
             .duration('100')
             .attr("r", 3);
 
         this.tooltip.transition()
             .duration('100')
-            .style('opacity', 0);
+            .style('opacity', 0);*/
     }
 
 
     showMouseTooltip(e) {
         // This allows to find the closest X index of the mouse:
-        var bisect = d3.bisector(function(d) { return d.x; }).left;
+        const bisect = d3.bisector(function(d) { return d.x; }).left;
         const x0 = this.xScale.invert(e.pageX-this.element.getBoundingClientRect().x-this.margin.left);
-        const i = bisect(this.data, x0, 1);
         d3.selectAll('.tooltip-line')
             .attr('x1', e.pageX-this.element.getBoundingClientRect().x-this.margin.left)
             .attr('x2', e.pageX-this.element.getBoundingClientRect().x-this.margin.left);
-        if(typeof (this.data[i]) === 'undefined'){
-            return
-        }
-        this.tooltip.style('opacity', 1);
-        this.tooltip.html('['+this.data[i].x+'; '+this.data[i].y+']')
-            .style('left', (this.xScale(this.data[i].x) + 10 + this.element.getBoundingClientRect().x) + "px")
-            .style('top', (this.yScale(this.data[i].y)+ 10 + this.element.getBoundingClientRect().y) + "px");
+
+        this.data.forEach((course) => {
+            const tooltip = this.tooltips[course.courseID];
+            const i = bisect(course.points, x0, 1);
+            if(typeof (course.points[i]) === 'undefined'){
+                return
+            }
+            tooltip.style('opacity', 0.9);
+
+            //tooltip.html('['+course.points[i].x+'; '+course.points[i].y+']')
+            tooltip.html(`[${parseFloat(course.points[i].x).toFixed(2)};
+            ${parseFloat(course.points[i].y).toFixed(2)}]`)
+                .style('left', (this.xScale(course.points[i].x) + 10 + this.element.getBoundingClientRect().x) + "px")
+                .style('top', (this.yScale(course.points[i].y)+ 10 + this.element.getBoundingClientRect().y) + "px")
+                .style('background-color', course.color)
+                .style('border-color', course.color);
+        });
     }
 
     resize(e){
