@@ -147,6 +147,26 @@
 .tile-buttons > button{
     margin: 0 10px;
 }
+.tile > input[type=text]{
+    font-family: 'Rubik', sans-serif;
+    border: none;
+    outline: none;
+    background: none;
+    width: 100%;
+    height: auto;
+    font-size: 16px;
+    text-align: center;
+    font-weight: 400;
+    padding: 1px;
+    margin: 0;
+    border-radius: 0;
+    color: white;
+}
+.tile > input:hover, .tile > input:active, .tile > input:focus{
+    border: none;
+    border-bottom: white 1px solid;
+    outline: none;
+}
 .br:not(:last-child){
     content:"";
     margin-top: 20px;

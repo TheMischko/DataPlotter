@@ -49,7 +49,7 @@ export default class FileSelectPagePage extends IModalPage{
     d3.select('#uploadButton')
       .on('click', (e) => { this.uploadButtonClick(e) });
     d3.select('#editFileButton')
-      .on('click', (e) => {  });
+      .on('click', (e) => { this.editButtonClick(e) });
     d3.select('#deleteFileButton')
       .on('click', (e) => { this.deleteButtonClick(e) })
   }
@@ -93,12 +93,28 @@ export default class FileSelectPagePage extends IModalPage{
           .on('click', (e) => {this.fileTileClickHandler(e)})
           .html(`
           <i class="fas fa-file-csv"></i>
-          <div>${file.nickname}</div>
+          <div class="fileName">${file.nickname}</div>
+          <input class="hidden" type="text" name="fileName" value="${file.nickname}">
           <div>${new Date(file.created_at).toLocaleDateString()}</div>
           `)
+      });
+      // Event listeners for setting the change to fileName input
+      document.querySelectorAll(".tile input").forEach((input) => {
+        input.addEventListener("change", (e) => { this.saveFileChanges(e)});
+        input.addEventListener("keyup", (e) => {
+          if(e.key === "Enter" || e.keyCode === 13){
+              this.saveFileChanges(e);
+          }
+        });
+        input.addEventListener("focusout", (e) => {
+          d3.select(e.target).classed("hidden", true);
+          d3.select(e.target.parentNode).select(".fileName").classed("hidden", false);
+        });
+      });
+    });
 
-      })
-    })
+
+
   }
 
   /**
@@ -168,6 +184,43 @@ export default class FileSelectPagePage extends IModalPage{
     this.jobDone = true;
     this.file = null;
     this.modal.forceNextPage();
+  }
+
+  editButtonClick(e) {
+    const activeTile = d3.selectAll(".tile.selected");
+    activeTile.select("input").classed("hidden", false).node().focus();
+    activeTile.select(".fileName").classed("hidden", true);
+  }
+
+  saveFileChanges(e) {
+    document.activeElement.blur();
+    const newFileName = e.target.value;
+    const fileID = e.target.parentNode.getAttribute("file-id");
+
+    const SERVER_URL = localStorage.getItem('SERVER_URL');
+    $.ajax({
+      url: SERVER_URL + "/files/rename",
+      method: "POST",
+      data: {
+        fileID: fileID,
+        nickname: newFileName
+      },
+      success: (res) => {
+        d3.select(e.target).classed("hidden", true).text(newFileName);
+        d3.select(e.target.parentNode).select(".fileName").classed("hidden", false).text(newFileName);
+      },
+      error: (res) => {
+        console.error("Couldn't save changes to file.")
+        const oldText = d3.select(e.target.parentNode)
+          .select(".fileName")
+          .classed("hidden", false)
+          .node().innerHTML;
+        d3.select(e.target).classed("hidden", true).text(oldText);
+
+      }
+    })
+
+    console.log(fileID);
   }
 
   /**
