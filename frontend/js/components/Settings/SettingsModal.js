@@ -162,11 +162,28 @@ export default class SettingsModal extends Modal{
 
     getAllPlotData(){
         return new Promise(((resolve, reject) => {
-            const fileID = this.data.file;
             const viewID = this.data.view;
-            if(typeof fileID === "undefined" || typeof viewID === "undefined" || fileID === "" || viewID === ""){
+            if(typeof viewID === "undefined" || viewID === ""){
                 reject()
             }
+            const SERVER_URL = localStorage.getItem("SERVER_URL");
+            $.ajax({
+                url: SERVER_URL+`/valuesFromView?viewID=${viewID}`,
+                method: 'GET',
+                beforeSend: (req) => {
+                    req.setRequestHeader('Access-Control-Allow-Origin', SERVER_URL)
+                    req.setRequestHeader('Access-Control-Allow-Credentials', 'true')
+                },
+                success: (res) => {
+                    resolve(JSON.parse(res));
+                },
+                error: (res) => {
+                    console.error("Could't load View data!");
+                    console.error(res);
+                    reject(res);
+                }
+            });
+            /*
             this.getViewData(viewID).then(async (view) => {
                 localStorage.setItem('title', view.title);
                 localStorage.setItem('viewID', view._id);
@@ -182,10 +199,11 @@ export default class SettingsModal extends Modal{
                 console.error((err));
                 reject();
             })
-        }));
+        }));*/
+    }))};
 
-    }
 
+    /*
     getViewData(viewID){
         return new Promise(((resolve, reject) => {
             const SERVER_URL = localStorage.getItem("SERVER_URL");
@@ -205,8 +223,8 @@ export default class SettingsModal extends Modal{
             })
 
         }));
-    }
-
+    }*/
+    /*
     getPlotData(fileID, xColumn, yColumn, func){
         return new Promise(((resolve, reject) => {
             const SERVER_URL = localStorage.getItem("SERVER_URL");
@@ -230,7 +248,7 @@ export default class SettingsModal extends Modal{
 
             })
         }));
-    }
+    }*/
 
 
     forceNextPage() {

@@ -3,7 +3,8 @@ const functions = {
   SMA50: (values) => simple_moving_average(values, 50),
   SMA100: (values) => simple_moving_average(values, 100),
   SMA500: (values) => simple_moving_average(values, 500),
-  SMA1000: (values) => simple_moving_average(values, 500)
+  SMA1000: (values) => simple_moving_average(values, 500),
+  x100: (values) => multiplyValues(values, 100)
 }
 
 
@@ -26,6 +27,14 @@ const simple_moving_average = (values, a) => {
     }
     values_new[i] = {x: values[i].x, y: (sum/n)};
   }
+  return values_new;
+}
+
+
+const multiplyValues = (values, multiplicator) => {
+  let values_new = [];
+  for(let i = 0; i < values.length; i++)
+    values_new.push({x: values[i].x, y: values[i].y*multiplicator});
   return values_new;
 }
 

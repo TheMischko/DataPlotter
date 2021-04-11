@@ -1,10 +1,15 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
+const courseValuesSchema = new Schema({
+  yColumn:  { type: String},
+  func:     { type: String},
+  color:    { type: String}
+})
+
 const plotSettingsSchema = new Schema({
   xColumn:  { type: String },
-  yColumn:  { type: String },
-  func:     { type: String }
+  values:  { type: [courseValuesSchema] }
 });
 
 const viewSchema = new Schema({

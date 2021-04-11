@@ -9,13 +9,13 @@ export default class ViewMakerPage extends IModalPage {
     super(modal);
     this.title = "Create view by selecting axes and functions over data";
     this.settings = "";
-    this.init();
+    this.init().then();
     this.plots = 0;
     this.jobDone = true;
     this.plotSettings = null;
   }
 
-  init(){
+  async init(){
     const SERVER_URL = localStorage.getItem('SERVER_URL');
   }
 
@@ -29,6 +29,12 @@ export default class ViewMakerPage extends IModalPage {
 
   initFunctions(){
     const alreadyKnownView = this.modal.data.view;
+     this.getOptionsHTML().then((options) => {
+       this.options = options;
+     });
+    this.getFunctionsHTML().then((functions) => {
+      this.functions = functions;
+    });
     if(typeof alreadyKnownView !== "undefined" && alreadyKnownView !== null){
       this.viewID = alreadyKnownView;
       this.modal.forceNextPage();
@@ -63,9 +69,6 @@ export default class ViewMakerPage extends IModalPage {
   }
 
   async appendNewPlotEditor() {
-    const options = await this.getOptionsHTML();
-    const functions = await this.getFunctionsHTML();
-
     const root = d3.select('#viewMakerPage #plotSettings');
     root.append('div')
       .classed('setting', true)
@@ -75,25 +78,36 @@ export default class ViewMakerPage extends IModalPage {
         <h2>Plot ${this.plots+1}</h2>
         <form>
             <div class="row">
-                <label>X axis:</label>
+                <label>Main X axis:</label>
                 <select name="xColumn" class="select2">
-                    ${options}
+                    ${this.options}
+                </select>
+            </div>
+            <div class="br"></div>
+            <div class="row">
+            <label>Y0 axis:</label>
+                <select course="0" name="yColumn" class="select2">
+                    ${this.options}
                 </select>
             </div>
             <div class="row">
-            <label>Y axis:</label>
-                <select name="yColumn" class="select2">
-                    ${options}
+            <label>Function over Y0:</label>
+                <select course="0" name="func" class="select2">
+                    ${this.functions}
                 </select>
             </div>
             <div class="row">
-            <label>Function:</label>
-                <select name="func" class="select2">
-                    ${functions}
-                </select>
+                <label>Color of Y0 values:</label>
+                <input course="0" type="color" />
             </div>
+            <div class="br"></div>
         </form>
-      `);
+        
+      `).append('button')
+        .attr('style', "margin: 0 auto; display: block")
+        .classed('danger', true).classed('add_new_value_button', true)
+        .text('Add new values to this plot')
+        .on('click', (e) => { this.addNewValuesButtonClicked(e); });
 
     setTimeout(() => {
       jQuery('.select2').select2();
@@ -105,6 +119,7 @@ export default class ViewMakerPage extends IModalPage {
   getOptionsHTML() {
     return new Promise(((resolve, reject) => {
       const fileID = this.modal.data.file;
+      console.log("FileID: "+fileID);
       if(typeof fileID === "undefined")
         reject()
 
@@ -150,6 +165,29 @@ export default class ViewMakerPage extends IModalPage {
     this.appendNewPlotEditor().then();
   }
 
+  addNewValuesButtonClicked(e) {
+    let form = e.target.parentNode.querySelector('form');
+    const values = form.querySelectorAll('select[name=yColumn]');
+    form = d3.select(form)
+    form.append('div').classed('row', true)
+      .html(`
+        <label>Y${values.length} axis:</label>
+        <select course="${values.length}" name="yColumn" class="select2">${this.options}</select>
+      `);
+    form.append('div').classed('row', true)
+      .html(`
+        <label>Function over Y${values.length}:</label>
+        <select course="${values.length}" name="func" class="select2">${this.functions}</select>
+      `);
+    form.append('div').classed('row', true)
+      .html(`
+        <label>Color of Y${values.length} values:</label>
+        <input course="${values.length}" type="color" />
+      `)
+    form.append('div').classed('br', true);
+    jQuery('.select2').select2();
+  }
+
   /**
    * If page needs to return some values to other page of other classes, this function is used.
    * @returns
@@ -164,10 +202,23 @@ export default class ViewMakerPage extends IModalPage {
         const forms = jQuery(".setting form");
         const data = [];
         forms.each((i) => {
+          const selects = jQuery(forms[i]).find(`select[name=yColumn]`);
+          if(selects.length == 0)
+            return
+          const values = []
+          selects.each((j) => {
+            const y = jQuery(forms[i]).find(`select[name=yColumn][course=${j}]`).val();
+            const func = jQuery(forms[i]).find(`select[name=func][course=${j}]`).val();
+            const color = jQuery(forms[i]).find(`input[type=color][course=${j}]`).val();
+            values.push({
+              yColumn: y,
+              func: func,
+              color: color
+            })
+          });
           data.push({
             xColumn: jQuery(forms[i]).find('select[name=xColumn]').val(),
-            yColumn: jQuery(forms[i]).find('select[name=yColumn]').val(),
-            func: jQuery(forms[i]).find('select[name=func]').val()
+            values: values
           })
         });
         const fileID = this.modal.data.file;

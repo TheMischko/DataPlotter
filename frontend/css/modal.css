@@ -150,6 +150,13 @@
 .tile-wrapper .tile .deleteButton.clicked{
     left: 25%;
 }
+.br:not(:last-child){
+    content:"";
+    margin-top: 20px;
+    height: 20px;
+    width: 100%;
+    border-top: white 2px solid;
+}
 
 
 @media only screen and (min-width: 500px) {

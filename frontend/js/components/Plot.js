@@ -11,13 +11,8 @@ export default class Plot{
         this.selector = selector;
         this.options = options;
         this.zoomManager = options.zoomManager;
-        this.data = [{ points: options.data, courseID: 0, color: "#3cb371"}];
-        const augmented_graph = []
-        options.data.forEach((point) => {
-            augmented_graph.push({x: point.x, y: point.y/2});
-        })
-        this.data.push({points: augmented_graph, courseID: 1, color: "#2158fe"})
-        console.log(this.data);
+
+        this.parseData(options.data).then();
 
         this.lineFunctions = {};
         this.lineGraphs = {};
@@ -41,6 +36,23 @@ export default class Plot{
         this.setAxis();
 
         this.drawPlot();
+    }
+
+
+    parseData(data){
+        this.data = [];
+        return new Promise((resolve => {
+            data.forEach((course, i) => {
+                this.data.push({
+                    points: course.values,
+                    color: course.color,
+                    courseID: i,
+                    xColumn: course.xColumn,
+                    yColumn: course.yColumn,
+                    func: course.func
+                })
+            });
+        }));
     }
 
 

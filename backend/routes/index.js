@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const fileModel = require('../models/FileModel');
 const csvModel = require('../models/CsvModel');
+const viewModel = require('../models/ViewModel');
 const functions = require('../dataFunctions/dataFunctions');
 
 /* GET home page. */
@@ -31,6 +32,40 @@ router.get('/values', ((req, res) => {
     () => res.status(400).send('File not found.')
   );
 }));
+
+
+router.get("/valuesFromView", ((req, res) => {
+  const viewID = req.query['viewID'];
+
+  if(typeof viewID === "undefined" || viewID === "" || viewID === null)
+    res.status(400).send("Wrong viewID");
+
+  viewModel.getViewByID(viewID).then(
+    async (view) => {
+      const file = await fileModel.getFileByID(view.fileID);
+      const result = [];
+      for(let i = 0; i < view.plotSettings.length; i++){
+        const plot = [];
+        const settings = view.plotSettings[i];
+        for(let j = 0; j < settings.values.length; j++){
+          const val = settings.values[j];
+          let course = await csvModel.getValueTuples(file.filename, settings.xColumn, val.yColumn);
+          let funcName = ""
+          if (typeof val.func !== "undefined" && Object.keys(functions).includes(val.func))
+            course = functions[val.func](course);
+            funcName = val.func;
+          plot.push({xColumn: settings.xColumn, yColumn: val.yColumn, func: val.func, values: course, color: val.color});
+        }
+        result.push(plot);
+      }
+      res.send(JSON.stringify(result));
+    },
+    () => { res.status(400).send("Error during fetching saved View")}
+  );
+
+
+
+}))
 
 
 router.get('/headers', ((req, res) => {
