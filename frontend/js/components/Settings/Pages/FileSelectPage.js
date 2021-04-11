@@ -31,7 +31,11 @@ export default class FileSelectPagePage extends IModalPage{
       </p>
       <div id="fileSelectPage" class="tile-wrapper">
         <div class="tiles"></div>
-        <button>Upload new file!</button>
+        <div class="tile-buttons hidden">
+            <button id="editFileButton" class="success"><i class="fas fa-pencil-alt"></i>&nbsp;Edit file</button>
+            <button id="deleteFileButton" class="danger"><i class="fas fa-trash"></i>&nbsp;Delete file</button>
+        </div>
+        <button id="uploadButton"><i class="fas fa-file-upload"></i>&nbsp;Upload new file!</button>
       </div>
       `
       resolve(html);
@@ -42,8 +46,12 @@ export default class FileSelectPagePage extends IModalPage{
    * Used for inserting JS code in runtime environment
    */
   initFunctions() {
-    d3.select('#fileSelectPage > button')
+    d3.select('#uploadButton')
       .on('click', (e) => { this.uploadButtonClick(e) });
+    d3.select('#editFileButton')
+      .on('click', (e) => {  });
+    d3.select('#deleteFileButton')
+      .on('click', (e) => { this.deleteButtonClick(e) })
   }
 
 
@@ -88,10 +96,6 @@ export default class FileSelectPagePage extends IModalPage{
           <div>${file.nickname}</div>
           <div>${new Date(file.created_at).toLocaleDateString()}</div>
           `)
-          .append("button")
-            .classed('deleteButton', true)
-            .html("<i class=\"fas fa-times\"></i>")
-            .on("click", (e) => this.deleteButtonClick(e));
 
       })
     })
@@ -112,6 +116,9 @@ export default class FileSelectPagePage extends IModalPage{
     }
     d3.selectAll('#fileSelectPage .tile').classed('selected', false);
     target.classList.add('selected');
+
+    d3.selectAll(".tile-buttons").classed('hidden', false);
+
     const fileID = target.getAttribute('file-id');
     this.jobDone = true;
     this.file = fileID;
@@ -120,34 +127,41 @@ export default class FileSelectPagePage extends IModalPage{
 
   deleteButtonClick(e) {
     let target = e.target.tagName === "BUTTON" ? e.target : e.target.parentNode;
-    const fileID = target.parentNode.getAttribute("file-id");
-    if(typeof fileID === "undefined" || fileID === "")
-      return;
-
     if(target.classList.contains("clicked")){
-
       const SERVER_URL = localStorage.getItem('SERVER_URL');
+      const activeTile = d3.selectAll(".tile.selected");
+      const activeTileID = activeTile.attr("file-id");
+
       $.ajax({
-        url: SERVER_URL + '/files/delete',
-        method: 'POST',
+        url: SERVER_URL + "/files/delete",
+        method: "POST",
+        beforeSend: (req) => {
+          req.setRequestHeader('Access-Control-Allow-Origin', SERVER_URL)
+          req.setRequestHeader('Access-Control-Allow-Credentials', 'true')
+        },
         data: {
-          fileID: fileID
+          fileID: activeTileID
         },
         success: (res) => {
-          target.parentNode.parentNode.removeChild(target.parentNode);
+          activeTile.remove();
+          d3.selectAll(".tile-buttons").classed('hidden', true);
         },
         error: (res) => {
+          console.error("Couldn't delete file");
           console.error(res);
         }
       });
+
     } else {
       target.classList.add("clicked");
-      target.innerHTML = "Confirm";
-      setTimeout(()=>{
-        target.innerHTML = "<i class=\"fas fa-times\"></i>";
+      target.innerHTML = "Are you sure?";
+      setTimeout(() => {
         target.classList.remove("clicked");
+        target.innerHTML = "<i class=\"fas fa-trash\"></i>&nbsp;Delete file";
       }, 3000);
     }
+
+
   }
 
   uploadButtonClick(e) {

@@ -53,14 +53,18 @@ router.post('/delete', ((req, res) => {
   fileModel.deleteFile(fileID).then(
     async () => {
       const views = await viewModel.getAllViewsForFile(fileID);
+      if(typeof views === "string")
+        res.status(400).send(views);
       for (const view of views) {
-        await viewModel.deleteView(view._id);
+        const result =  await viewModel.deleteView(view._id);
+        if(result)
+          continue;
         const zooms = await zoomModel.getZoomsForView(view._id);
         for (const zoom of zooms) {
           await zoomModel.deleteZoom(zoom._id);
         }
-        res.status(200).send('Deleted');
       }
+      res.status(200).send('Deleted');
       },
     (err) => { res.status(400).send(err); }
   )

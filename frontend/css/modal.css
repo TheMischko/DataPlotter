@@ -136,19 +136,16 @@
     font-size: 50px;
     margin-bottom: 10px;
 }
-
-.tile-wrapper .tile .deleteButton{
-    position: relative;
+.tile-buttons{
     display: flex;
-    bottom: 80%;
-    left: 40%;
-    z-index: 10;
-    padding: 8px;
+    flex-direction: row;
     align-items: center;
-    background-color: #ff253a;
+    justify-content: center;
+    width: 100%;
+    margin: 10px;
 }
-.tile-wrapper .tile .deleteButton.clicked{
-    left: 25%;
+.tile-buttons > button{
+    margin: 0 10px;
 }
 .br:not(:last-child){
     content:"";

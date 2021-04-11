@@ -19,8 +19,12 @@ export default class ViewSelectPage extends IModalPage{
   }
 
   initFunctions(){
-    d3.select('#viewWrapper button')
+    d3.select('#createViewButton')
       .on('click', (e) => {this.createNewViewClickHandler(e)});
+    d3.select('#editViewButton')
+      .on('click', (e) => {});
+    d3.select('#deleteViewButton')
+      .on('click', (e) => { this.deleteButtonClick(e); });
   }
 
   /**
@@ -36,7 +40,11 @@ export default class ViewSelectPage extends IModalPage{
       </p>
       <div class="tile-wrapper" id="viewWrapper">
         <div class="tiles"></div>
-        <button>Create new View!</button>
+        <div class="tile-buttons hidden">
+            <button id="editViewButton" class="success"><i class="fas fa-pencil-alt"></i>&nbsp;Edit view</button>
+            <button id="deleteViewButton" class="danger"><i class="fas fa-trash"></i>&nbsp;Delete view</button>
+        </div>
+        <button id="createViewButton">Create new View!</button>
       </div>
       `
       resolve(html);
@@ -90,10 +98,6 @@ export default class ViewSelectPage extends IModalPage{
           <i class="fas fa-chart-line"></i>
           <div>${viewName}</div>
           <div><br/></div>`)
-          .append("button")
-            .classed('deleteButton', true)
-            .html("<i class=\"fas fa-times\"></i>")
-            .on("click", (e) => this.deleteButtonClick(e));
       })
     })
   }
@@ -113,6 +117,8 @@ export default class ViewSelectPage extends IModalPage{
     }
     d3.selectAll('#viewWrapper .tile').classed('selected', false);
     target.classList.add('selected');
+    d3.selectAll(".tile-buttons").classed('hidden', false);
+
     const viewID = target.getAttribute('view-id');
     this.jobDone = true;
     this.view = viewID;
@@ -127,12 +133,14 @@ export default class ViewSelectPage extends IModalPage{
 
   deleteButtonClick(e) {
     let target = e.target.tagName === "BUTTON" ? e.target : e.target.parentNode;
-    let viewID = target.parentNode.getAttribute("view-id");
+    let selectedView = d3.selectAll(".tile.selected");
+    let viewID = selectedView.attr("view-id");
     if(typeof viewID === "undefined" || viewID === null)
       return;
 
     if(target.classList.contains("clicked")){
       const SERVER_URL = localStorage.getItem('SERVER_URL');
+
       $.ajax({
         url: SERVER_URL + "/views/delete",
         method: "POST",
@@ -140,7 +148,8 @@ export default class ViewSelectPage extends IModalPage{
           id: viewID
         },
         success: (res) => {
-          target.parentNode.parentNode.removeChild(target.parentNode);
+          selectedView.remove();
+          d3.selectAll(".tile-buttons").classed('hidden', true);
         },
         error: (res) => {
           console.error(res);
@@ -148,9 +157,9 @@ export default class ViewSelectPage extends IModalPage{
       })
     } else {
       target.classList.add("clicked");
-      target.innerHTML = "Confirm";
+      target.innerHTML = "Are you sure?";
       setTimeout(()=>{
-        target.innerHTML = "<i class=\"fas fa-times\"></i>";
+        target.innerHTML = "<i class=\"fas fa-trash\"></i>&nbsp;Delete view";
         target.classList.remove("clicked");
       }, 3000);
     }
