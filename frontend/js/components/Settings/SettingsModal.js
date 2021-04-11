@@ -1,10 +1,7 @@
 import Modal from "./Modal";
 import * as d3 from "d3";
 import DataUploadPage from "./Pages/DataUploadPage";
-import ValueSelectorPage from "./Pages/ValueSelectorPage";
 import FileSelectPage from "./Pages/FileSelectPage";
-import Plot from "../Plot";
-import CsvLoader from "../CsvLoader";
 import ViewSelectPage from "./Pages/ViewSelectPage";
 import ViewMakerPage from "./Pages/ViewMakerPage";
 
@@ -87,7 +84,9 @@ export default class SettingsModal extends Modal{
     rightButtonClicked(e){
         const activeContent = this.content[this.activePage];
         activeContent.returnValue().then((outputData) => {
-            this.data[outputData.key] = outputData.value;
+            outputData.forEach((data) => {
+                this.data[data.key] = data.value;
+            });
             this.activePage++;
             if(this.activePage === this.content.length) {
                 this.activePage--;
@@ -95,6 +94,7 @@ export default class SettingsModal extends Modal{
             }
             else
                 this.redraw();
+
         });
     }
 
@@ -126,7 +126,6 @@ export default class SettingsModal extends Modal{
         }, 100);
 
     }
-
 
     activePageDoneHandler(){
         const activeContent = this.content[this.activePage];
@@ -178,83 +177,20 @@ export default class SettingsModal extends Modal{
                     resolve(JSON.parse(res));
                 },
                 error: (res) => {
-                    console.error("Could't load View data!");
+                    console.error("Couldn't load View data!");
                     console.error(res);
                     reject(res);
                 }
             });
-            /*
-            this.getViewData(viewID).then(async (view) => {
-                localStorage.setItem('title', view.title);
-                localStorage.setItem('viewID', view._id);
-                const plotSettings = view.plotSettings;
-                const plotsData = [];
-                for(const setting of plotSettings) {
-                    const data = await this.getPlotData(fileID, setting.xColumn, setting.yColumn, setting.func);
-                    plotsData.push(data);
-                }
-                resolve(plotsData);
-            }, (err) => {
-                console.error(("Could't load View data!"));
-                console.error((err));
-                reject();
-            })
-        }));*/
     }))};
-
-
-    /*
-    getViewData(viewID){
-        return new Promise(((resolve, reject) => {
-            const SERVER_URL = localStorage.getItem("SERVER_URL");
-            $.ajax({
-                url:    SERVER_URL + "/views?id=" + viewID,
-                method: 'GET',
-                beforeSend: (req) => {
-                    req.setRequestHeader('Access-Control-Allow-Origin', SERVER_URL)
-                    req.setRequestHeader('Access-Control-Allow-Credentials', 'true')
-                },
-                success: (res) => {
-                    resolve(JSON.parse(res));
-                },
-                error: (res) => {
-                    reject(res);
-                }
-            })
-
-        }));
-    }*/
-    /*
-    getPlotData(fileID, xColumn, yColumn, func){
-        return new Promise(((resolve, reject) => {
-            const SERVER_URL = localStorage.getItem("SERVER_URL");
-            $.ajax({
-                url: SERVER_URL + `/values?id=${fileID}&x_value=${xColumn}&y_value=${yColumn}&func=${func}`,
-                method: 'GET',
-                beforeSend: (req) => {
-                    req.setRequestHeader('Access-Control-Allow-Origin', SERVER_URL)
-                    req.setRequestHeader('Access-Control-Allow-Credentials', 'true')
-                },
-                success: (res) => {
-                    const res_parsed = JSON.parse(res);
-                    res_parsed.forEach((tuple) => {
-                        tuple.y = Number(tuple.y);
-                    })
-                    resolve(res_parsed);
-                },
-                error: (res) => {
-                    reject(res);
-                }
-
-            })
-        }));
-    }*/
 
 
     forceNextPage() {
         const activeContent = this.content[this.activePage];
         activeContent.returnValue().then((outputData) => {
-            this.data[outputData.key] = outputData.value;
+            outputData.forEach((data) => {
+                this.data[data.key] = data.value;
+            });
             this.rightButtonClicked();
         })
     }

@@ -56,10 +56,10 @@ export default class IModalPage{
      */
     returnValue(){
         return new Promise(((resolve, reject) => {
-            resolve({
+            resolve([{
                 key: null,
                 value: null
-            });
+            }]);
         }))
 
     }

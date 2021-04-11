@@ -229,10 +229,10 @@ export default class FileSelectPagePage extends IModalPage{
    */
   returnValue(){
     return new Promise(((resolve, reject) => {
-      resolve({
+      resolve([{
         key:    "file",
         value:  this.file
-      });
+      }]);
     }))
   }
 

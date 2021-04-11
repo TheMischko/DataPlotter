@@ -26,10 +26,10 @@ const getViews = () => {
  */
 const getViewByID = (viewID) => {
   return new Promise(((resolve, reject) => {
-    View.find({_id: viewID},(err, views) => {
+    View.findOne({_id: viewID},(err, view) => {
       if(err)
         reject(err);
-      resolve(views[0]);
+      resolve(view);
     });
   }));
 }
@@ -100,7 +100,7 @@ const editView = (viewID, changes) => {
       if(err)
         reject(err);
       else
-        resolve();
+        resolve(view._id);
     });
   }))
 }

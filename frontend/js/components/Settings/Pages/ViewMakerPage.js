@@ -13,6 +13,7 @@ export default class ViewMakerPage extends IModalPage {
     this.plots = 0;
     this.jobDone = true;
     this.plotSettings = null;
+    this.isEditing = false;
   }
 
   async init(){
@@ -29,15 +30,25 @@ export default class ViewMakerPage extends IModalPage {
 
   initFunctions(){
     const alreadyKnownView = this.modal.data.view;
-     this.getOptionsHTML().then((options) => {
-       this.options = options;
-     });
+    const isEditView = this.modal.data.viewEdit;
+    this.getOptionsHTML().then((options) => {
+     this.options = options;
+    });
     this.getFunctionsHTML().then((functions) => {
       this.functions = functions;
     });
+
     if(typeof alreadyKnownView !== "undefined" && alreadyKnownView !== null){
-      this.viewID = alreadyKnownView;
-      this.modal.forceNextPage();
+      if(typeof isEditView !== "undefined" && isEditView === true){
+        this.viewID = alreadyKnownView;
+        this.isEditing = true;
+        setTimeout(() => {
+          this.recreateViewSettings().then();
+        }, 100);
+      } else {
+        this.viewID = alreadyKnownView;
+        this.modal.forceNextPage();
+      }
     }
     d3.select('#viewMakerPage button')
       .on('click', (e) => {this.newViewClickHandler()});
@@ -51,7 +62,6 @@ export default class ViewMakerPage extends IModalPage {
             also select function that changes values over X-axis. You can also add multiple plots to single view.
         </p>
         <div id="viewMakerPage" class="tile-wrapper">
-            
             <div id="plotSettings">
             <div class="setting">
                 <row>
@@ -60,7 +70,7 @@ export default class ViewMakerPage extends IModalPage {
                 </row>
             </div>
             </div>
-            <button>Add new View!</button>
+            <button id="addNewPlotButton">Add new Plot!</button>
         </div>
       `;
       resolve(html);
@@ -109,11 +119,9 @@ export default class ViewMakerPage extends IModalPage {
         .text('Add new values to this plot')
         .on('click', (e) => { this.addNewValuesButtonClicked(e); });
 
-    setTimeout(() => {
       jQuery('.select2').select2();
       d3.selectAll(`.delete-button`).on('click', (e) => {console.log(this.returnValue())});
       this.plots++;
-      }, 100)
   }
 
   getOptionsHTML() {
@@ -188,39 +196,134 @@ export default class ViewMakerPage extends IModalPage {
     jQuery('.select2').select2();
   }
 
+  async recreateViewSettings() {
+    await this.getViewDataFromServer();
+    if(this.settings === "")
+      return
+    const settings = this.settings;
+    console.log(settings);
+    console.log(d3.select("#plotName"));
+    d3.select("#plotName").node().value = settings.title;
+    for(let i = 0; i < settings.plotSettings.length-1; i++){
+      await this.appendNewPlotEditor();
+    }
+    for(let i = 0; i < this.plots; i++){
+      let plot = d3.select(`.setting[plot="${i}"]`);
+      plot.select("select[name='xColumn']").node().value = settings.plotSettings[0].xColumn;
+
+      const values = settings.plotSettings[i].values;
+      const newValuesButton = plot.select(".add_new_value_button");
+      for(let j = 0; j < values.length-1; j++){
+        newValuesButton.node().click();
+      }
+      for(let j = 0; j < values.length; j++){
+        const y = jQuery(`.setting[plot="${i}"] select[course="${j}"][name="yColumn"]`);
+        y.val(values[j].yColumn);
+        y.trigger("change");
+
+        const f = jQuery(`.setting[plot="${i}"] select[course="${j}"][name="func"]`);
+        f.val(values[j].func);
+        f.trigger("change");
+
+        plot.select(`input[course="${j}"][type="color"]`).node().value = values[j].color;
+      }
+    }
+  }
+
+  getViewDataFromServer() {
+    return new Promise(((resolve, reject)=> {
+      if(typeof this.viewID === "undefined" || this.viewID === "")
+        reject("No viewID is set.")
+
+      const SERVER_URL = localStorage.getItem('SERVER_URL');
+      $.ajax({
+        url: SERVER_URL + `/views?id=${this.viewID}`,
+        method: "GET",
+        success: (res) => {
+          this.settings = JSON.parse(res);
+          resolve();
+        },
+        error: (res) => {
+          console.error("Couldn't fetch view data from server.")
+          console.error(res);
+          reject(res)
+        }
+      })
+    }))
+  }
+
+  parseInputs() {
+    const forms = jQuery(".setting form");
+    const data = [];
+    // Parse all inputs and fetch those data to 'data' array
+    forms.each((i) => {
+      const selects = jQuery(forms[i]).find(`select[name=yColumn]`);
+      if(selects.length === 0)
+        return
+      const values = []
+      selects.each((j) => {
+        const y = jQuery(forms[i]).find(`select[name=yColumn][course=${j}]`).val();
+        const func = jQuery(forms[i]).find(`select[name=func][course=${j}]`).val();
+        const color = jQuery(forms[i]).find(`input[type=color][course=${j}]`).val();
+        values.push({
+          yColumn: y,
+          func: func,
+          color: color
+        })
+      });
+      data.push({
+        xColumn: jQuery(forms[i]).find('select[name=xColumn]').val(),
+        values: values
+      })
+    });
+    return data;
+  }
+
   /**
    * If page needs to return some values to other page of other classes, this function is used.
    * @returns
    */
   returnValue(){
     return new Promise(((resolve, reject) => {
-      //If viewID is known from previous page, skip API call and return this viewID.
       if(typeof this.viewID !== "undefined" && this.viewID !== null) {
-        resolve(this.viewID);
+        if(typeof this.isEditing !== "undefined" && this.isEditing === true){
+          const data = this.parseInputs();
+          const fileID = this.modal.data.file;
+          const SERVER_URL = localStorage.getItem('SERVER_URL');
+          const plotName = jQuery("#plotName").val()
+          const viewID = this.viewID;
+
+          $.ajax({
+            url: SERVER_URL + '/views/edit',
+            method: 'POST',
+            data: {
+              fileID: fileID,
+              title: plotName,
+              plotSettings: JSON.stringify(data),
+              viewID: viewID
+            },
+            success: (res) => {
+              this.viewID = res;
+              resolve([{
+                key: "view",
+                value: this.viewID
+              }]);
+            },
+            error: (res) => {
+              reject(res);
+            }
+          });
+        } else {
+          //If viewID is known from previous page, skip API call and return this viewID.
+          resolve([{
+            key: "view",
+            value: this.viewID
+          }]);
+        }
       } else {
         // Else save data via API and return newly created ID
-        const forms = jQuery(".setting form");
-        const data = [];
-        forms.each((i) => {
-          const selects = jQuery(forms[i]).find(`select[name=yColumn]`);
-          if(selects.length == 0)
-            return
-          const values = []
-          selects.each((j) => {
-            const y = jQuery(forms[i]).find(`select[name=yColumn][course=${j}]`).val();
-            const func = jQuery(forms[i]).find(`select[name=func][course=${j}]`).val();
-            const color = jQuery(forms[i]).find(`input[type=color][course=${j}]`).val();
-            values.push({
-              yColumn: y,
-              func: func,
-              color: color
-            })
-          });
-          data.push({
-            xColumn: jQuery(forms[i]).find('select[name=xColumn]').val(),
-            values: values
-          })
-        });
+        const data = this.parseInputs()
+        // Send fetched data to server
         const fileID = this.modal.data.file;
         const SERVER_URL = localStorage.getItem('SERVER_URL');
         const plotName = jQuery("#plotName").val()
@@ -234,10 +337,10 @@ export default class ViewMakerPage extends IModalPage {
           },
           success: (res) => {
             this.viewID = res;
-            resolve({
+            resolve([{
               key: "view",
               value: this.viewID
-            });
+            }]);
           },
           error: (res) => {
             reject(res);

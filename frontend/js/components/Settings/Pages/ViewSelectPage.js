@@ -7,7 +7,7 @@ export default class ViewSelectPage extends IModalPage{
   constructor(modal) {
     super(modal);
     this.title = "Select or create View over File";
-    this.settings = "";
+    this.editView = false;
   }
 
   /**
@@ -20,11 +20,12 @@ export default class ViewSelectPage extends IModalPage{
 
   initFunctions(){
     d3.select('#createViewButton')
-      .on('click', (e) => {this.createNewViewClickHandler(e)});
+      .on('click', (e) => { this.createNewViewClickHandler(e); });
     d3.select('#editViewButton')
-      .on('click', (e) => {});
+      .on('click', (e) => { this.editButtonClick(e); });
     d3.select('#deleteViewButton')
       .on('click', (e) => { this.deleteButtonClick(e); });
+    this.editView = false;
   }
 
   /**
@@ -165,16 +166,34 @@ export default class ViewSelectPage extends IModalPage{
     }
   }
 
+  editButtonClick(e) {
+    let selectedView = d3.selectAll(".tile.selected");
+    let viewID = selectedView.attr("view-id");
+    if(typeof viewID === "undefined" || viewID === null)
+      return;
+
+    this.view = viewID;
+    this.editView = true;
+
+    this.modal.forceNextPage();
+  }
+
   /**
    * If page needs to return some values to other page of other classes, this function is used.
    * @returns
    */
   returnValue(){
     return new Promise(((resolve, reject) => {
-      resolve({
-        key:    "view",
-        value:  this.view
-      });
+      resolve([
+        {
+          key:    "view",
+          value:  this.view
+        },
+        {
+          key: "viewEdit",
+          value: this.editView
+        }
+        ]);
     }))
 
   }

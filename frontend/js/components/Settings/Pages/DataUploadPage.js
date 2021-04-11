@@ -234,10 +234,10 @@ export default class DataUploadPage extends IModalPage{
      */
     returnValue(){
         return new Promise(((resolve, reject) => {
-            resolve({
+            resolve([{
                 key:    "file",
                 value:  this.file
-            });
+            }]);
         }))
 
     }
