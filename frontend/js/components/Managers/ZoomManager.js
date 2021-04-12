@@ -7,6 +7,9 @@ import Zoom from "../Classes/Zoom";
 const $ = require('jquery-ajax');
 
 export default class ZoomManager {
+  /**
+   * Constructor for ZoomManager class.
+   */
   constructor() {
     this.ZOOMS_KEY = 'zooms';
     this.init();
@@ -94,6 +97,10 @@ export default class ZoomManager {
     }
   }
 
+  /**
+   * Saves zooms to localStorage.
+   * @param zooms {*}[] - Zoom object containing these keys: String id, String name, [Number][] zoomSequence
+   */
   setLocalZooms(zooms){
     localStorage.setItem(this.ZOOMS_KEY, JSON.stringify(zooms));
   }
@@ -263,7 +270,10 @@ export default class ZoomManager {
     }
   }
 
-
+  /**
+   * Fire new custom event plotSelectionChanged that signalize that zoom occurred.
+   * @param from - source of event
+   */
   fireChangeEvent(from = null) {
     const event = new Event('plotSelectionChanged');
     if(from !== null)

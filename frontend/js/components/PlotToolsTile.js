@@ -2,6 +2,9 @@ import * as d3 from "d3";
 import ImageManager from "./Managers/ImageManager";
 import 'file-saver'
 
+/**
+ * Class that corresponds to menu tile that handles actions over active plot.
+ */
 export default class PlotToolsTile{
   constructor(element, selector, options) {
     this.element = element;
@@ -15,11 +18,16 @@ export default class PlotToolsTile{
     // Menu title
     parent.append('h1')
       .text('Plot menu:');
-    // Save as Image button
+    // Save as Bitmap Image button
     parent.append('button')
       .html('<i class="far fa-image"></i>&nbsp;Save as an image')
       .attr('title', 'Saves current plot as an image.')
       .on('click', (e) => {this.saveImageClicked(e)})
+    // Save as SVG Image button
+    parent.append('button')
+      .html('<i class="far fa-file-image"></i>&nbsp;Save as an SVG')
+      .attr('title', 'Saves current plot as an SVG image.')
+      .on('click', (e) => {this.saveSVGImageClicked(e)})
     // This is used for optimization of handling the mousemove event.
     // Only if this is True, event is handled.
     this.caresAboutMouse = true
@@ -88,9 +96,8 @@ export default class PlotToolsTile{
    * Function that is called when the button for saving plot as image is pressed.
    *
    * Serializes the active SVG element, transform it to bitmap and download it to client.
-   * @param e Event
    */
-  saveImageClicked(e) {
+  saveImageClicked() {
     const svgString = this.imageManager.getSVGString(this.relatedPlot);
     this.imageManager.svgString2Image(
       svgString,
@@ -100,5 +107,21 @@ export default class PlotToolsTile{
       (dataBlob, fileSize) => {
         saveAs(dataBlob, 'test.png');
       });
+  }
+
+  /**
+   * Function that extracts SVG code and all related CSS from active plot, creates SVG file out of it
+   * and lets the file download to user.
+   */
+  saveSVGImageClicked() {
+    let svgString = this.imageManager.getSVGString(this.relatedPlot);
+    svgString = '<?xml version="1.0" standalone="no"?>\r\n' + svgString;
+    let imgSrc = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+    const link = document.createElement('A');
+    document.body.append(link);
+    link.setAttribute('href', imgSrc);
+    link.setAttribute('download', "plot.svg");
+    link.click();
+    document.body.removeChild(link);
   }
 }

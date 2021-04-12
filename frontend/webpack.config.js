@@ -5,7 +5,7 @@ module.exports = {
     mode: 'development',
     entry: './js/index.js',
     output: {
-        path: path.resolve(__dirname, 'dist'),
+        path: path.resolve(__dirname, '../backend/public/dist'),
         filename: 'bundle.js'
     },
     plugins: [new MiniCssExtractPlugin({

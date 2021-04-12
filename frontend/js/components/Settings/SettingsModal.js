@@ -6,8 +6,16 @@ import ViewSelectPage from "./Pages/ViewSelectPage";
 import ViewMakerPage from "./Pages/ViewMakerPage";
 
 const $ = require('jquery-ajax');
-
+/**
+ * Class of the modal window that handles getting data from user so other part of application
+ * can create plots from them.
+ */
 export default class SettingsModal extends Modal{
+    /**
+     * Set which page are shown in modal.
+     * Pages are shown in consecutively in order in which are in this.content array.
+     * So this.content[0] is shown first, this.content[1] is shown as second etc.
+     */
     setupContent(){
         this.content = [
             new FileSelectPage(this),
@@ -33,12 +41,16 @@ export default class SettingsModal extends Modal{
         document.addEventListener('setupNeeded', e => this.onSetupNeedHandler(e))
     }
 
-
+    /**
+     * Hide modal when data for plots are loaded.
+     */
     onPageLoadedHandler() {
         d3.select('#'+this.DOM_ID).classed('hidden', true);
     }
 
-
+    /**
+     * If event showSettingModal occurs, show modal
+     */
     onShowNeededHandler() {
         this.element.style('display', 'block');
         this.element.style('opacity', '1');
@@ -46,6 +58,9 @@ export default class SettingsModal extends Modal{
         this.redraw();
     }
 
+    /**
+     * Sets footer part of modal and creates it in DOM.
+     */
     createFooter(){
         this.setFooter('');
         const rowDiv = this.appendFooter('div')
@@ -71,9 +86,13 @@ export default class SettingsModal extends Modal{
             .classed('footer-button', 'true')
             .text(this.activePage === this.content.length-1 ? 'Finish' :'Next')
             .on('click', (e) => this.rightButtonClicked(e))
-
     }
 
+    /**
+     * Handler for leftButton click event.
+     * Shows previous page.
+     * @param e Event
+     */
     leftButtonClicked(e){
         this.activePage--;
         this.content[this.activePage].resetOutputValue();
@@ -81,6 +100,11 @@ export default class SettingsModal extends Modal{
         this.redraw();
     }
 
+    /**
+     * Handler for rightButton click event.
+     * Saves output from current page and shows next or finishes the settings routine.
+     * @param e Event
+     */
     rightButtonClicked(e){
         const activeContent = this.content[this.activePage];
         activeContent.returnValue().then((outputData) => {
@@ -98,9 +122,11 @@ export default class SettingsModal extends Modal{
         });
     }
 
+    /**
+     * Redraws content of modal with content of active page.
+     */
     redraw(){
         const activeContent = this.content[this.activePage];
-        console.log(this.data);
         const headerHTML = `<h1>Step ${this.activePage+1}: ${activeContent.getTitle()}</h1>`
         this.setHeader(headerHTML);
         activeContent.getContent().then(r => {
@@ -127,6 +153,10 @@ export default class SettingsModal extends Modal{
 
     }
 
+    /**
+     * This function is called by pages. Pages signalize to modal that their work is done
+     * and user is able to continue on next page.
+     */
     activePageDoneHandler(){
         const activeContent = this.content[this.activePage];
         if(!activeContent.isAllowedToNext()){
@@ -136,9 +166,15 @@ export default class SettingsModal extends Modal{
         d3.select('#settingModal-rightButton').attr('disabled', null);
     }
 
+    /**
+     * This function is called when there are no other pages and user finished whole setup routine.
+     * All data are saved so other parts of application can use then.
+     * Fires onFinishEvent and hides modal.
+     */
     onFinishHandler(){
         this.getAllPlotData().then((data) => {
             localStorage.setItem('plotData', JSON.stringify(data));
+            localStorage.setItem('viewID', JSON.stringify(this.data.view));
             const onFinishEvent = new CustomEvent('setupFinished');
             onFinishEvent.settings = this.data
             document.dispatchEvent(onFinishEvent);
@@ -153,12 +189,21 @@ export default class SettingsModal extends Modal{
         });
     }
 
+    /**
+     * Handler for showSettingModal event.
+     * Resets saved modal data and shows first page.
+     * @param e Event
+     */
     onSetupNeedHandler(e) {
         this.data = {};
         this.activePage = 0;
         this.onShowNeededHandler();
     }
 
+    /**
+     * Async function that call backend API for data for plots described by data saved from pages.
+     * @return {Promise<{}[]>} Returns data for plots in array of objects.
+     */
     getAllPlotData(){
         return new Promise(((resolve, reject) => {
             const viewID = this.data.view;
@@ -184,7 +229,9 @@ export default class SettingsModal extends Modal{
             });
     }))};
 
-
+    /**
+     * Immediately show next page without user clicking on rightButton.
+     */
     forceNextPage() {
         const activeContent = this.content[this.activePage];
         activeContent.returnValue().then((outputData) => {

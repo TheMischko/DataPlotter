@@ -1,5 +1,8 @@
 import * as d3 from "d3";
 
+/**
+ * Class that corresponds to menu tile that handles operations over zooms and other functionalities.
+ */
 export default class ZoomToolsTile {
   constructor(element, selector, options) {
     this.element = element;
@@ -30,14 +33,17 @@ export default class ZoomToolsTile {
       .on('click', (e) => { this.deleteModeButtonOnClick(e) })
   }
 
-
+  /**
+   * Handles event when button of delete mode for zooms is pressed.
+   * @param e Event
+   */
   deleteModeButtonOnClick(e) {
     let target = e.target;
     // If button is not target, but icon is, set target to button
     if(target.tagName === 'I')
       target = target.parentNode;
-
     let isDeleteModeOn = target.classList.contains('deleteModeOn');
+    // Switch for both modes(Delete on| Delete off)
     if(isDeleteModeOn){
       d3.select(target)
         .html('<i class="fas fa-trash"></i>&nbsp;Delete zooms mode')
@@ -61,13 +67,19 @@ export default class ZoomToolsTile {
     }
   }
 
-
+  /**
+   * Handles event when Reset view button is pressed.
+   * @param e Event
+   */
   resetViewButtonOnClick(e) {
     this.zoomManager.setSelection(null);
     this.zoomManager.fireChangeEvent();
   }
 
-
+  /**
+   * Handles event when Load new plot button is pressed
+   * @param e Event
+   */
   loadNewPlotButtonClicked(e) {
     const event = new Event('setupNeeded')
     event.source = e.target;

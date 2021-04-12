@@ -1,6 +1,3 @@
-
-import MainPlot from "./components/Plot";
-import CsvLoader from "./components/CsvLoader";
 import Modal from "./components/Settings/SettingsModal";
 import RightBar from "./components/RightBar";
 import ZoomManager from "./components/Managers/ZoomManager";
@@ -15,6 +12,7 @@ const plotManager = new PlotManager('plots', zoomManager);
 const SERVER_URL = 'http://localhost:3000'
 localStorage.setItem('SERVER_URL', SERVER_URL);
 
+// Appends Javascript objects to certain HTML element.
 const components = [
     {
         class:      Modal,
@@ -48,23 +46,7 @@ components.forEach(component => {
     }
 });
 
-document.addEventListener('plotMouseOver', (e) => {
-    //console.log('plotMouseOver');
-    //console.log(e);
-});
-
-document.addEventListener('plotMouseLeave', (e) => {
-    //console.log('plotMouseLeave');
-    //console.log(e);
-});
-
+//Show main content on data ready.
 document.addEventListener('setupFinished', (e) => {
     document.getElementById('wrapper').style.opacity = '1';
-    //console.log('setupFinished');
-    //console.log(e);
-});
-
-document.addEventListener('setupNeeded', (e) => {
-   //console.log('setupNeeded');
-   //console.log(e);
 });

@@ -126,12 +126,22 @@ export default class ViewSelectPage extends IModalPage{
     this.modal.activePageDoneHandler();
   }
 
+  /**
+   * Handler for createView button.
+   * Moves a user to page where new View is made.
+   * @param e Event
+   */
   createNewViewClickHandler(e) {
     this.view = null;
     this.jobDone = true;
     this.modal.forceNextPage();
   }
 
+  /**
+   * Handles click event on deleteButton.
+   * Deletes selected view.
+   * @param e Event
+   */
   deleteButtonClick(e) {
     let target = e.target.tagName === "BUTTON" ? e.target : e.target.parentNode;
     let selectedView = d3.selectAll(".tile.selected");
@@ -166,6 +176,11 @@ export default class ViewSelectPage extends IModalPage{
     }
   }
 
+  /**
+   * Handles click event on editButton
+   * Shows input in view tile and hides name div.
+   * @param e Event
+   */
   editButtonClick(e) {
     let selectedView = d3.selectAll(".tile.selected");
     let viewID = selectedView.attr("view-id");

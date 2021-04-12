@@ -78,6 +78,10 @@ export default class ViewMakerPage extends IModalPage {
     }))
   }
 
+  /**
+   * Async function that appends new form for creating new View in DOM.
+   * @return {Promise<void>}
+   */
   async appendNewPlotEditor() {
     const root = d3.select('#viewMakerPage #plotSettings');
     root.append('div')
@@ -124,6 +128,11 @@ export default class ViewMakerPage extends IModalPage {
       this.plots++;
   }
 
+  /**
+   * Async function that calls Backend api for possible value columns from file that user can select from
+   * and returns them as option tags array.
+   * @return {Promise<String[]>}
+   */
   getOptionsHTML() {
     return new Promise(((resolve, reject) => {
       const fileID = this.modal.data.file;
@@ -150,6 +159,11 @@ export default class ViewMakerPage extends IModalPage {
     }));
   }
 
+  /**
+   * Async function that calls Backend api for possible function that user can select from
+   * and returns them as option tags array.
+   * @return {Promise<String[]>}
+   */
   getFunctionsHTML() {
     return new Promise(((resolve, reject) => {
       const SERVER_URL = localStorage.getItem('SERVER_URL');
@@ -169,10 +183,19 @@ export default class ViewMakerPage extends IModalPage {
     }));
   }
 
+  /**
+   * Simulates click on addNewView button.
+   * @param e
+   */
   newViewClickHandler(e) {
     this.appendNewPlotEditor().then();
   }
 
+  /**
+   * Handler for click event on addNewValue button.
+   * Appends new inputs to form in plot setting with target button.
+   * @param e Event
+   */
   addNewValuesButtonClicked(e) {
     let form = e.target.parentNode.querySelector('form');
     const values = form.querySelectorAll('select[name=yColumn]');
@@ -196,6 +219,10 @@ export default class ViewMakerPage extends IModalPage {
     jQuery('.select2').select2();
   }
 
+  /**
+   * Async function that fills all inputs with data from Backend API for saved viewID.
+   * @return {Promise<void>}
+   */
   async recreateViewSettings() {
     await this.getViewDataFromServer();
     if(this.settings === "")
@@ -230,6 +257,11 @@ export default class ViewMakerPage extends IModalPage {
     }
   }
 
+  /**
+   * Async function that calls backend API for View data.
+   * @return {{}} View object from Backend, it contains these keys: String _id, String title,
+   * String fileID, {}[] plotSettings
+   */
   getViewDataFromServer() {
     return new Promise(((resolve, reject)=> {
       if(typeof this.viewID === "undefined" || this.viewID === "")
@@ -252,6 +284,10 @@ export default class ViewMakerPage extends IModalPage {
     }))
   }
 
+  /**
+   * Parses all inputs on page and returns values in array.
+   * @return {[]} view details
+   */
   parseInputs() {
     const forms = jQuery(".setting form");
     const data = [];

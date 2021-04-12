@@ -3,6 +3,9 @@ import IModalPage from "./IModalPage";
 
 const $ = require('jquery-ajax');
 
+/**
+ * Page that provides all uploaded data to user and handles file selection.
+ */
 export default class FileSelectPagePage extends IModalPage{
   constructor(modal) {
     super(modal);
@@ -53,7 +56,6 @@ export default class FileSelectPagePage extends IModalPage{
     d3.select('#deleteFileButton')
       .on('click', (e) => { this.deleteButtonClick(e) })
   }
-
 
   /**
    * Gets all files from database.
@@ -112,9 +114,6 @@ export default class FileSelectPagePage extends IModalPage{
         });
       });
     });
-
-
-
   }
 
   /**
@@ -141,6 +140,11 @@ export default class FileSelectPagePage extends IModalPage{
     this.modal.activePageDoneHandler();
   }
 
+  /**
+   * Handles click event on deleteButton.
+   * Deletes selected file.
+   * @param e Event
+   */
   deleteButtonClick(e) {
     let target = e.target.tagName === "BUTTON" ? e.target : e.target.parentNode;
     if(target.classList.contains("clicked")){
@@ -167,7 +171,6 @@ export default class FileSelectPagePage extends IModalPage{
           console.error(res);
         }
       });
-
     } else {
       target.classList.add("clicked");
       target.innerHTML = "Are you sure?";
@@ -176,23 +179,36 @@ export default class FileSelectPagePage extends IModalPage{
         target.innerHTML = "<i class=\"fas fa-trash\"></i>&nbsp;Delete file";
       }, 3000);
     }
-
-
   }
 
+  /**
+   * Handles click event on uploadButton
+   * Moves to user to page that handles file uploading.
+   * @param e Event
+   */
   uploadButtonClick(e) {
     this.jobDone = true;
     this.file = null;
     this.modal.forceNextPage();
   }
 
+  /**
+   * Handles click event on editButton
+   * Shows input in file tile and hides name div.
+   * @param e Event
+   */
   editButtonClick(e) {
     const activeTile = d3.selectAll(".tile.selected");
     activeTile.select("input").classed("hidden", false).node().focus();
     activeTile.select(".fileName").classed("hidden", true);
   }
 
+  /**
+   * Handler that is called when writing a new name for file is done.
+   * @param e Event
+   */
   saveFileChanges(e) {
+    // Loose focus
     document.activeElement.blur();
     const newFileName = e.target.value;
     const fileID = e.target.parentNode.getAttribute("file-id");
@@ -216,11 +232,8 @@ export default class FileSelectPagePage extends IModalPage{
           .classed("hidden", false)
           .node().innerHTML;
         d3.select(e.target).classed("hidden", true).text(oldText);
-
       }
     })
-
-    console.log(fileID);
   }
 
   /**

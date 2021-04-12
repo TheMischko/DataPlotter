@@ -25,7 +25,6 @@ export default class Modal {
         this.create();
     }
 
-
     /**
      * Generates empty modal window structure to the DOM via D3.js
      * DOM structure is this:
@@ -72,7 +71,6 @@ export default class Modal {
         this.element = modal;
     }
 
-
     /**
      * Gets the d3.selection instance of this modal window.
      * @returns D3.selection
@@ -91,7 +89,6 @@ export default class Modal {
         console.log('setting header');
     }
 
-
     /**
      * Applies .append function of D3.js on header library and returns its new selection of appended tag.
      * @param tagName string
@@ -101,7 +98,6 @@ export default class Modal {
         return this.header.append(tagName);
     }
 
-
     /**
      * Enables to set HTML of the header DIV of the modal.
      * @param html string
@@ -109,7 +105,6 @@ export default class Modal {
     setBody(html){
         this.body.html(html);
     }
-
 
     /**
      * Applies .append function of D3.js on body library and returns its new selection of appended tag.
@@ -119,7 +114,6 @@ export default class Modal {
     appendBody(tagName){
         return this.body.append(tagName);
     }
-
 
     /**
      * Enables to set HTML of the header DIV of the modal.

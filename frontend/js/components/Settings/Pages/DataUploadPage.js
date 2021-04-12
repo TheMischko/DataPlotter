@@ -3,6 +3,9 @@ import IModalPage from "./IModalPage";
 import css from "../../../../css/DataUpload.css"
 const $ = require('jquery-ajax');
 
+/**
+ * Page that handles uploading file with data from users input.
+ */
 export default class DataUploadPage extends IModalPage{
 
     constructor(modal) {

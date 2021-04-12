@@ -2,6 +2,9 @@ import * as d3 from "d3";
 import ZoomsTile from "./ZoomsTile";
 import ZoomToolsTile from "./ZoomToolsTile";
 
+/**
+ * Class that corresponds to right bar on main page.
+ */
 export default class RightBar{
   constructor(element, selector, options) {
     this.element = element;
@@ -14,7 +17,7 @@ export default class RightBar{
 
   init(){
     const bar = d3.select(this.element);
-
+    // Show when all data are stored in memory.
     document.addEventListener('setupFinished', (e) => {
       bar.style('opacity', '1');
     });
