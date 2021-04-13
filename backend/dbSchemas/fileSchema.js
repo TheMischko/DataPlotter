@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
+/**
+ * Mongoose schema for file object in database.
+ * @type {module:mongoose.Schema<Document, Model<any, any>, undefined>}
+ */
 const fileSchema = new Schema({
   nickname:     {type: String, default: ''},
   filename:     {type: String, default: ''},

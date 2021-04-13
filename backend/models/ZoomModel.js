@@ -63,7 +63,13 @@ const getZoomsForView = (viewID) => {
   }));
 }
 
-
+/**
+ * Changes data of existing zoom in database.
+ * @param zoomID {String} ID of zoom that has to change
+ * @param changes {{}} object containing changes
+ * Keys has to be names of the properties in database and values has to be new values.
+ * @return {Promise<unknown>}
+ */
 const updateZoom = (zoomID, changes) => {
   return new Promise(((resolve, reject) => {
     Zoom.findByIdAndUpdate(zoomID, changes, {runValidators: true}, (err, zoom) => {

@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const zoomModel = require('../models/ZoomModel');
 
+/**
+ * Handler for GET request on /zooms endpoint.
+ * Sends back all zooms that corresponds with View set by ID in request query.
+ */
 router.get('/', ((req, res) => {
   const viewID = req.query.viewID;
   if(typeof viewID === "undefined"){
@@ -13,7 +17,10 @@ router.get('/', ((req, res) => {
   );
 }));
 
-
+/**
+ * Handler for POST request on /zooms/add endpoint.
+ * Saves new Zoom to database from data from request body and sends back ID of newly created zoom.
+ */
 router.post('/add', ((req, res) => {
   try{
     const sequence = JSON.parse(req.body.sequence);
@@ -26,7 +33,10 @@ router.post('/add', ((req, res) => {
   }
 }));
 
-
+/**
+ * Handler for POST request to /zooms/delete endpoint.
+ * Deletes zoom in database with ID from request body.
+ */
 router.post('/delete', ((req, res) => {
   const id = req.body.id;
   if(typeof id === "undefined")
@@ -38,6 +48,10 @@ router.post('/delete', ((req, res) => {
   );
 }));
 
+/**
+ * Handler for POST request to /zooms/update endpoint.
+ * Updates zoom in database by information given in request body.
+ */
 router.post('/update', (((req, res) => {
   let zoomID = undefined;
   let viewID = undefined;

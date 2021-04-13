@@ -1,6 +1,7 @@
 const fileSchema = require('../dbSchemas/fileSchema');
 const mongoose = require('mongoose');
 const File = mongoose.model('Files', fileSchema);
+const fs = require('fs');
 
 /**
  * Saves any CSV file from HTTP request to folder on server.
@@ -110,7 +111,11 @@ const findSimilarFile = (md5, mimetype) => {
   }))
 }
 
-
+/**
+ * Deletes file with specified ID both from database and from filesystem.
+ * @param fileID {String} ID of file in database
+ * @return {Promise<void|String>} Returns error if there is any.
+ */
 const deleteFile = (fileID) => {
   return new Promise(((resolve, reject) => {
     resolve();
@@ -118,12 +123,22 @@ const deleteFile = (fileID) => {
       if(err)
         reject(err);
       else
-        resolve();
+        fs.unlink(process.env.CSV_FILE_FOLDER + file.filename, (err) => {
+          if(err)
+            reject(err);
+          else
+            resolve();
+        });
     })
   }))
 }
 
-
+/**
+ * Changes nickname of file in database.
+ * @param fileID {String} ID of file in database
+ * @param nickname {String} new nickname for the file
+ * @return {Promise<void|String>} Returns error if there is any.
+ */
 const changeNickname = (fileID, nickname) => {
   return new Promise(((resolve, reject) => {
     File.findOneAndUpdate({_id: fileID}, {nickname: nickname}, (err, file) => {

@@ -5,11 +5,10 @@ const csvModel = require('../models/CsvModel');
 const viewModel = require('../models/ViewModel');
 const functions = require('../dataFunctions/dataFunctions');
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.send(null);
-});
-
+/**
+ * Handler for GET request on /values endpoint.
+ * Sends back array of tuples from CSV file values, where xColumn and yColumn is set by body of request.
+ */
 router.get('/values', ((req, res) => {
   const csvID = req.query['id'];
   const x_value = typeof req.query['x_value'] === "undefined" ? 'linear scale' : req.query['x_value'];
@@ -33,7 +32,10 @@ router.get('/values', ((req, res) => {
   );
 }));
 
-
+/**
+ * Handler for GET request on /valuesFromView endpoint.
+ * Sends back values defined by columns saved in View, that user reference by ID in request query.
+ */
 router.get("/valuesFromView", ((req, res) => {
   const viewID = req.query['viewID'];
 
@@ -67,22 +69,31 @@ router.get("/valuesFromView", ((req, res) => {
 
 }))
 
-
+/**
+ * Handler for GET request on /headers endpoint.
+ * Sends back all column names from CSV file set by ID in request query.
+ */
 router.get('/headers', ((req, res) => {
   const csvID = req.query.id;
   if(typeof csvID === "undefined" || csvID === null){
     res.status(400).send('No ID specified.')
   }
-  fileModel.getFileByID(csvID).then((file) => {
-    csvModel.getHeaders(file.filename).then((headers => {
+  fileModel.getFileByID(csvID).then(
+    (file) => {
+    csvModel.getHeaders(file.filename).then(
+      (headers => {
       res.send(JSON.stringify(headers));
-    }));
-
-  }, () => {
-    res.status(400).send('No File with that ID found.')
+    }),
+    () => {
+      res.status(400).send('No File with that ID found.')
+    });
   });
 }));
 
+/**
+ * Handler for GET request on /functions endpoint.
+ * Sends back all possible functions that can operate over CSV data.
+ */
 router.get('/functions', ((req, res) => {
   const func = Object.keys(functions);
   res.status(200).send(JSON.stringify(func));

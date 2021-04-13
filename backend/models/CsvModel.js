@@ -3,6 +3,11 @@ const csv = require('csv-parser');
 
 const csv_dir = process.env.CSV_FILE_FOLDER;
 
+/**
+ * Scales for generation values over data from CSV files.
+ * Scale is a function with index of current value as input and should return some float value.
+ * @type {{"logarithmic scale": (function(*=): number), "linear scale": (function(*): *)}}
+ */
 const scales =
   {
     "linear scale": (i) => i,
@@ -26,6 +31,14 @@ const getHeaders = (filename) => {
   }))
 };
 
+/**
+ * Reads specified CSV file and with given names of columns creates array of tuples
+ * with values X and Y.
+ * @param filename {String} name of file in default CSV folder
+ * @param xValue {String} name of the column for X values;
+ * @param yValue {String} name of the column for Y values;
+ * @return {Promise<{}[]>} Returns array of objects that contains number values under properties x and y.
+ */
 const getValueTuples = (filename, xValue, yValue) => {
   const values = [];
   let i = 0;
