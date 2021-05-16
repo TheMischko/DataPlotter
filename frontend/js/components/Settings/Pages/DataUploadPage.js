@@ -136,6 +136,7 @@ export default class DataUploadPage extends IModalPage{
         if (typeof file === "undefined" || file === null) {
             error.classed('show', true);
             error.text(error.text().replace('.', 'Error - No files were uploaded, try again.'));
+            notify("No files were uploaded, try again.", {type: "danger"})
             return;
         }
         const SERVER_URL = localStorage.getItem("SERVER_URL");
@@ -162,11 +163,14 @@ export default class DataUploadPage extends IModalPage{
                 d3.select('label[for="fileUpload"] > strong').text('Choose a new file again');
 
                 d3.select('#fileNameRow').classed("hidden", false);
+
+                notify("File was successfully uploaded, you can continue to the next page.", {type: "success"});
             },
             error: (res) => {
                 error.classed('show', true);
                 d3.select('#fileNameRow').classed("hidden", true);
-                error.text(error.text().replace('.', res));
+                error.text(error.text().replace('.', res.responseText));
+                notify(res.responseText, {type: "danger"});
             }
         });
     }
@@ -217,14 +221,19 @@ export default class DataUploadPage extends IModalPage{
             $.ajax({
                 url: SERVER_URL + "/files/rename",
                 method: 'POST',
+                beforeSend: (req) => {
+                    req.setRequestHeader('Access-Control-Allow-Origin', SERVER_URL)
+                    req.setRequestHeader('Access-Control-Allow-Credentials', 'true')
+                },
                 data: {
                     fileID: this.file,
                     nickname: value
                 },
                 success: (res) => {
-                    console.log(res);
+                    notify("File name set successfully.", {type: "success"});
                 },
                 error: (res) => {
+                    notify("Problem with renaming the file occurred.", {type: "danger"});
                     console.error(res);
                 }
             })

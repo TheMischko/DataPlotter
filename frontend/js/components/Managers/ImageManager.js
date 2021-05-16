@@ -12,6 +12,7 @@ export default class ImageManager{
    * @returns {string} Serialized SVG element.
    */
   getSVGString(svgNode){
+    if(svgNode == null) return undefined;
     svgNode.setAttribute('xlink', 'http://www.w3.org/1999/xlink');
     const cssStyleText = this.getCssStyles(svgNode);
     const cssElement = this.appendCss(cssStyleText, svgNode);
@@ -32,6 +33,7 @@ export default class ImageManager{
    * @returns {string} Serialized CSS rules.
    */
   getCssStyles(parentElement) {
+    if(parentElement == null) return undefined;
     const selectorTextArr = [];
     // Add Parent element Id and Classes to the list
     selectorTextArr.push('#'+parentElement.id);
@@ -87,6 +89,7 @@ export default class ImageManager{
    * @returns {HTMLStyleElement} Newly created <style></style> element.
    */
   appendCss(cssText, element){
+    if(cssText == null || element == null) return undefined;
     const styleElement = document.createElement('style');
     styleElement.setAttribute('type', 'text/css');
     styleElement.innerHTML = cssText;
@@ -106,6 +109,7 @@ export default class ImageManager{
    *                  has two params: Blob and Filesize as number
    */
   svgString2Image(svgString, width, height, format, callback){
+    if(svgString == null || width == null || height == null || format == null || callback == null) return undefined;
     let format_type = format ? format : 'png';
     //Convert
     let imgSrc = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));

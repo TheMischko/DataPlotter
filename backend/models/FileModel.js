@@ -13,10 +13,15 @@ const fs = require('fs');
  */
 const saveCSV = (inFile) => {
   return new Promise(((resolve, reject) => {
+    if(inFile == null) {
+      reject("Value of inFile is null");
+      return;
+    }
     const csvMime = process.env.CSV_MIMETYPE;
 
     if(inFile.mimetype !== csvMime) {
-      reject();
+      reject("File is not type of CSV.");
+      return;
     }
 
     let dateString = new Date().toJSON();
@@ -46,7 +51,11 @@ const saveCSV = (inFile) => {
           //Saving to DB
           dbFile.save((err, dbFile) => {
             //All saved.
-            if(err) return console.log(err);
+            if(err) {
+              fs.unlink(`${csvFolder}${fileName}`, () => {});
+              reject(err.message);
+              return;
+            }
             resolve(dbFile['_id']);
           })
         });
@@ -60,10 +69,19 @@ const saveCSV = (inFile) => {
  */
 const getFiles = () => {
   return new Promise(((resolve, reject) => {
-    File.find((err, files) => {
-      if(err)
+    File.find(async (err, files) => {
+      if(err) {
         reject(err);
-      resolve(files);
+        return;
+      }
+      let file_list = [...files];
+      for(let i = 0; i < files.length; i++){
+        if(!fs.existsSync(process.env.CSV_FILE_FOLDER + files[i].filename)){
+          file_list.splice(file_list.indexOf(files[i]), 1);
+          deleteFile(files[i]._id).then();
+        }
+      }
+      resolve(file_list);
     })
   }));
 }
@@ -76,11 +94,15 @@ const getFiles = () => {
  */
 const getFileByID = (fileID) => {
   return new Promise(((resolve, reject) => {
+    if(fileID == null) reject("Wrong file ID");
     File.findOne({_id: fileID}, (err, file) => {
       if(err || typeof file === "undefined" || file === null) {
         reject();
       } else {
-        resolve(file)
+        if (fs.existsSync(process.env.CSV_FILE_FOLDER + file.filename))
+          resolve(file)
+        else
+          deleteFile(file._id).then();
       }
     })
   }))
@@ -97,11 +119,12 @@ const getFileByID = (fileID) => {
  */
 const findSimilarFile = (md5, mimetype) => {
   return new Promise(((resolve, reject) => {
+    if(md5 == null || mimetype == null) reject()
     File.find({md5: md5, mimetype: mimetype},
       (err, files) => {
         if(err) {
-          console.log(err);
           reject()
+          return;
         }
         if(files.length > 0)
           resolve(files);
@@ -118,14 +141,14 @@ const findSimilarFile = (md5, mimetype) => {
  */
 const deleteFile = (fileID) => {
   return new Promise(((resolve, reject) => {
-    resolve();
+    if(fileID == null) reject();
     File.findOneAndDelete({_id: fileID}, (err, file) => {
       if(err)
-        reject(err);
+        reject(err.message);
       else
         fs.unlink(process.env.CSV_FILE_FOLDER + file.filename, (err) => {
           if(err)
-            reject(err);
+            reject(err.message);
           else
             resolve();
         });
@@ -141,6 +164,7 @@ const deleteFile = (fileID) => {
  */
 const changeNickname = (fileID, nickname) => {
   return new Promise(((resolve, reject) => {
+    if(fileID == null || nickname == null) resolve();
     File.findOneAndUpdate({_id: fileID}, {nickname: nickname}, (err, file) => {
       if(err)
         reject(err);

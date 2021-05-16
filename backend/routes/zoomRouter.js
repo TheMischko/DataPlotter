@@ -13,7 +13,7 @@ router.get('/', ((req, res) => {
   }
   zoomModel.getZoomsForView(viewID).then(
     (zooms) => { res.status(200).send(JSON.stringify(zooms)) },
-    () => { res.status(400).send('Nothing found.') }
+    () => { res.status(200).send([]) }
   );
 }));
 
@@ -26,7 +26,7 @@ router.post('/add', ((req, res) => {
     const sequence = JSON.parse(req.body.sequence);
     zoomModel.addZoom(req.body.title, sequence, req.body.viewID).then(
       (zoom) => { res.status(200).send(JSON.stringify(zoom)); },
-      () => { res.status(400).send('Cannot save.'); }
+      () => { res.status(400).send('Cannot save zoom to the database.'); }
     );
   } catch(e){
     res.status(400).send(JSON.stringify(e));

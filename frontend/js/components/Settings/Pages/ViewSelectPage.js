@@ -63,6 +63,7 @@ export default class ViewSelectPage extends IModalPage{
     return new Promise(((resolve, reject) => {
       if(typeof fileID === "undefined" || fileID === null || fileID === ""){
         reject("File ID is not specified");
+        return;
       }
       $.ajax({
         url: SERVER_URL + `/views?fileID=${fileID}`,
@@ -76,6 +77,7 @@ export default class ViewSelectPage extends IModalPage{
           resolve(response);
         },
         error: (res) => {
+          notify("Couldn't fetch views for this file.", {type: "danger"});
           reject(res);
         }
       })
@@ -100,7 +102,7 @@ export default class ViewSelectPage extends IModalPage{
           <div>${viewName}</div>
           <div><br/></div>`)
       })
-    })
+    }, (err) => {});
   }
 
   /**
@@ -159,10 +161,12 @@ export default class ViewSelectPage extends IModalPage{
           id: viewID
         },
         success: (res) => {
+          notify("File was deleted successfully.", {type: "success"});
           selectedView.remove();
           d3.selectAll(".tile-buttons").classed('hidden', true);
         },
         error: (res) => {
+          notify("Couldn't delete file on server.", {type: "danger"});
           console.error(res);
         }
       })

@@ -19,25 +19,29 @@ export default class Plot{
         this.options = options;
         this.zoomManager = options.zoomManager;
         // Saves data from parameter to this.data attribute.
-        this.parseData(options.data).then();
-        // Line parts of the plot for each individual course.
-        this.lineGraphs = {};
-        // Data of point corresponding to each individual course.
-        this.points = {};
-        // Tooltip elements for each individual course.
-        this.tooltips = {};
-        // D3 selection of parent node of this.element.
-        this.parent = d3.select(this.element.parentNode);
-        // Handle resize event.
-        window.addEventListener('resize', (e) => {
-            this.resize(e);
-        })
-        // Initialize plot.
-        this.init(element);
-        // Set axis for this plot.
-        this.setAxis();
-        // Draw courses to SVG element.
-        this.drawPlot();
+        this.parseData(options.data).then(() => {
+            // Line parts of the plot for each individual course.
+            this.lineGraphs = {};
+            // Data of point corresponding to each individual course.
+            this.points = {};
+            // Tooltip elements for each individual course.
+            this.tooltips = {};
+            // D3 selection of parent node of this.element.
+            this.parent = d3.select(this.element.parentNode);
+            // Handle resize event.
+            window.addEventListener('resize', (e) => {
+                this.resize(e);
+            })
+            // Initialize plot.
+            this.init(element);
+            // Set axis for this plot.
+            this.setAxis();
+            // Draw courses to SVG element.
+            this.drawPlot();
+        }, (err) => {
+            notify(err, {type: "danger"});
+            console.error(err);
+        });
     }
 
     /**
@@ -48,7 +52,11 @@ export default class Plot{
      */
     parseData(data){
         this.data = [];
-        return new Promise((resolve => {
+        return new Promise(((resolve, reject) => {
+            if(data == null) {
+                reject("Data for plot are null");
+                return;
+            }
             data.forEach((course, i) => {
                 this.data.push({
                     points: course.values,
@@ -59,6 +67,7 @@ export default class Plot{
                     func: course.func
                 })
             });
+            resolve();
         }));
     }
 
@@ -150,7 +159,10 @@ export default class Plot{
                     const event = new Event('plotSelectionChanged')
                     event.from = 'mouse';
                     const selection = e.selection !== null
-                      ? [e.selection[0]/(this.width-this.margin.left), e.selection[1]/(this.width-this.margin.left)]
+                      ? [
+                        e.selection[0]/(this.width-this.margin.left),
+                        e.selection[1]/(this.width-this.margin.left)
+                      ]
                       : null;
                     // Save selection as percentage of pixels selected from plot.
                     localStorage.setItem('selection', JSON.stringify(selection));

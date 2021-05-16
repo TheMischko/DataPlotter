@@ -86,7 +86,6 @@ export default class Modal {
      */
     setHeader(html){
         this.header.html(html);
-        console.log('setting header');
     }
 
     /**

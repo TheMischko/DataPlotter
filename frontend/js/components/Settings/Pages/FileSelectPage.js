@@ -77,6 +77,7 @@ export default class FileSelectPagePage extends IModalPage{
         },
         error: (res) => {
           reject(res);
+          notify("Couldn't load file saved on server.", {type: "danger"});
         }
       })
     }));
@@ -87,6 +88,13 @@ export default class FileSelectPagePage extends IModalPage{
    */
   drawFiles() {
     this.getFiles().then((files) => {
+      if(files.length === 0){
+        d3.select('#fileSelectPage .tiles')
+          .append('div')
+          .attr("style", "color: grey; margin: 20px;")
+          .text("File archive is empty.")
+        return;
+      }
       files.forEach((file) => {
         d3.select('#fileSelectPage .tiles')
           .append('div')
@@ -164,10 +172,12 @@ export default class FileSelectPagePage extends IModalPage{
         },
         success: (res) => {
           activeTile.remove();
+          notify("File deleted successfully.", {type: "success"});
           d3.selectAll(".tile-buttons").classed('hidden', true);
         },
         error: (res) => {
-          console.error("Couldn't delete file");
+          notify("Couldn't delete file.", {type: "danger"});
+          reject.error("Couldn't delete file");
           console.error(res);
         }
       });
@@ -217,16 +227,22 @@ export default class FileSelectPagePage extends IModalPage{
     $.ajax({
       url: SERVER_URL + "/files/rename",
       method: "POST",
+      beforeSend: (req) => {
+        req.setRequestHeader('Access-Control-Allow-Origin', SERVER_URL)
+        req.setRequestHeader('Access-Control-Allow-Credentials', 'true')
+      },
       data: {
         fileID: fileID,
         nickname: newFileName
       },
       success: (res) => {
+        notify("Changes to file were successfully saved.", {type: "success"});
         d3.select(e.target).classed("hidden", true).text(newFileName);
         d3.select(e.target.parentNode).select(".fileName").classed("hidden", false).text(newFileName);
       },
       error: (res) => {
-        console.error("Couldn't save changes to file.")
+        console.error(res);
+        notify("Couldn't save changes to file.", {type: "danger"});
         const oldText = d3.select(e.target.parentNode)
           .select(".fileName")
           .classed("hidden", false)
@@ -248,6 +264,4 @@ export default class FileSelectPagePage extends IModalPage{
       }]);
     }))
   }
-
-
 }

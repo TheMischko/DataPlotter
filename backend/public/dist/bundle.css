@@ -1,0 +1,602 @@
+:root{
+    --modal-border-color: #b0b0b0
+}
+.modal{
+    display: block;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.1);
+}
+.modal-content{
+    background-color: whitesmoke;
+    margin: 5% auto;
+    border: 2px solid #b0b0b0;
+    width: 80%;
+    max-width: 826px;
+    border-radius: 10px;
+
+}
+.modal-header{
+    background-color: #1e90ff;
+    color: whitesmoke;
+    text-align: center;
+    text-transform: uppercase;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 9px 9px 0 0;
+}
+.header-content > h1, .header-exit > h1{
+    margin: 0;
+    padding: 5px 15px;
+    font-size: 17px;
+}
+.header-content{
+    width: 100%;
+}
+.header-exit{
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0);
+    transition: background-color 0.75s ease;
+}
+.header-exit:hover{
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-body{
+    padding: 2rem;
+    max-height: 60vh;
+    overflow-y: scroll;
+}
+
+.modal-footer{
+    padding: 1rem;
+    margin: 0 2rem;
+    border-top: var(--modal-border-color) 2px solid;
+}
+.footer-row{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+#settingModal-pagesIndicator{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+#settingModal-pagesIndicator > .page{
+    margin: 0 5px;
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-radius: 10px;
+    background-color: var(--modal-border-color);
+    transition: all 0.5s ease;
+}
+#settingModal-pagesIndicator > .page.active{
+    background-color: dodgerblue;
+    width: 12px;
+    height: 12px;
+}
+.fileUpload-input{
+    margin: 0 30px;
+}
+.value-selector{
+    columns: 1;
+}
+.tile-wrapper{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.tile-wrapper > button {
+    font-size: 18px;
+}
+.tile-wrapper > button:hover {
+    font-size: 20px !important;
+}
+.tile-wrapper .tiles{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    margin-bottom: 10px;
+}
+.tile-wrapper .tile{
+    width: 125px;
+    height: 125px;
+    margin: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid grey;
+    box-shadow: 0 0 3px 4px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: color, background-color 0.5s ease-in-out;
+}
+.tile-wrapper .tile:hover, .tile-wrapper .tile.selected{
+    background-color: dodgerblue;
+    color: white;
+}
+
+.tile-wrapper .tile > i {
+    font-size: 50px;
+    margin-bottom: 10px;
+}
+.tile-buttons{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin: 10px;
+}
+.tile-buttons > button{
+    margin: 0 10px;
+}
+.tile > input[type=text]{
+    font-family: 'Rubik', sans-serif;
+    border: none;
+    outline: none;
+    background: none;
+    width: 100%;
+    height: auto;
+    font-size: 16px;
+    text-align: center;
+    font-weight: 400;
+    padding: 1px;
+    margin: 0;
+    border-radius: 0;
+    color: white;
+}
+.tile > input:hover, .tile > input:active, .tile > input:focus{
+    border: none;
+    border-bottom: white 1px solid;
+    outline: none;
+}
+.br:not(:last-child){
+    content:"";
+    margin-top: 20px;
+    height: 20px;
+    width: 100%;
+    border-top: white 2px solid;
+}
+
+
+@media only screen and (min-width: 500px) {
+    .header-content > h1, .header-exit > h1{
+        margin: 0;
+        padding: 10px 20px;
+        font-size: 20px;
+    }
+}
+@media only screen and (min-width: 800px) {
+    .header-content > h1, .header-exit > h1{
+        margin: 0;
+        padding: 12px 24px;
+        font-size: 24px;
+    }
+    .value-selector{
+        columns: 2;
+    }
+}
+@media only screen and (min-width: 1050px) {
+}
+@media only screen and (min-width: 1250px) {
+    .value-selector{
+        columns: 3;
+    }
+}
+@media only screen and (min-width: 1800px) {
+
+}
+
+/*
+https://tympanus.net/codrops/2015/09/15/styling-customizing-file-inputs-smart-way/
+ */
+.fileUpload-dragndrop,
+.fileUpload-message {
+    margin-top: 1rem;
+    display: none;
+}
+#fileUpload{
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+.fileUpload-box{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto;
+    width: 80%;
+    height: 200px;
+    border-radius: 5px;
+    background: #eeeeee;
+    color: #888888;
+}
+.fileUpload-box.has-advanced-upload{
+    outline-offset: -15px;
+    outline: #b0b0b0 2px dashed;
+}
+
+.fileUpload-box.has-advanced-upload .fileUpload-dragndrop {
+    display: inline;
+}
+
+.fileUpload-box.is-dragover{
+    background: #ffffff;
+}
+label[for="fileUpload"] > strong{
+    cursor: pointer;
+    transition: color 0.5s;
+}
+label[for="fileUpload"] > strong:hover{
+    color: dodgerblue;
+}
+.fileUpload-message.show{
+    display: inline-block;
+}
+.fileUpload-error{
+    color: #ff253a;
+}
+.fileUpload-success{
+    color: #2d8856;
+}
+#fileNameRow{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+#fileNameRow.hidden{
+    opacity: 0;
+    cursor: default;
+}
+#fileNameRow.hidden > #fileName:hover{
+    cursor: default;
+}
+input[type=text]{
+    padding: 5px;
+    border-radius: 5px;
+    width: 60%;
+    margin-left: 10px;
+    font-size: 18px;
+}
+#plotSettings{
+    margin-bottom: 20px;
+}
+
+#plotSettings > .setting{
+    width: 600px;
+    color: white;
+    padding: 15px 15px 30px 30px;
+    background-color: dodgerblue;
+    border-radius: 20px;
+    margin-bottom: 20px;
+}
+
+#plotSettings > .setting .row{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 80%;
+    margin: 0 auto 10px 0;
+}
+
+.setting .row label{
+    margin: 0 10px;
+}
+
+.setting .row select{
+    width: 70%;
+}
+
+.select2 *, .setting input{
+    outline: none;
+    border: none;
+}
+
+.setting input{
+    padding: 5px;
+    border-radius: 5px;
+    width: 60%;
+    margin-left: 10px;
+    font-size: 18px;
+}
+
+.setting h2{
+    margin-top: -5px;
+    font-size: 30px;
+}
+
+.setting > .delete-button{
+    width: 30px;
+    height: 30px;
+    display: block;
+    margin: 0 0 0 auto;
+    padding: 5px;
+    font-size: 20px;
+    border-radius: 100%;
+}
+.setting > .delete-button:hover{
+    padding: 5px;
+    font-size: 20px;
+    background-color: #ff253a;
+}
+#plots{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 95%;
+    margin: 0 5px;
+}
+.plot{
+    margin: 0 0 10px 0;
+    display: block;
+    background: white;
+    border-radius: 5px;
+    padding: 10px 5px 20px 5px;
+}
+.grid line {
+    stroke: lightgrey;
+    stroke-opacity: 0.7;
+    shape-rendering: crispEdges;
+}
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    padding: 5px;
+    background: mediumseagreen;
+    color: whitesmoke;
+    border: 2px solid #2d8856;
+    border-radius: 8px;
+    pointer-events: none;
+    font-size: 10px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    transform: translateY(-40px);
+}
+.axis {
+    shape-rendering: crispEdges;
+    font-family: 'Lato', sans-serif;
+    font-size: 9px;
+}
+#xAxis > .tick:nth-of-type(2n) > text {
+    transform: translateY(10px);
+}
+.curve{
+    stroke: mediumseagreen;
+    stroke-width: 2;
+    fill: none
+}
+.dot{
+    stroke: mediumseagreen;
+    stroke-width: 2;
+    fill: white;
+    opacity: 0;
+}
+@media only screen and (min-width: 800px) {
+    .axis {
+        font-size: 12px;
+    }
+
+    div.tooltip {
+        font-size: 13px;
+    }
+}
+@media only screen and (min-width: 1050px) {
+    #xAxis > .tick:nth-of-type(2n) > text {
+        transform: translateY(11px);
+    }
+    .axis {
+        font-size: 14px;
+    }
+
+    div.tooltip {
+        font-size: 14px;
+    }
+}
+@media only screen and (min-width: 1500px) {
+}
+@media only screen and (min-width: 1800px) {
+    #xAxis > .tick:nth-of-type(2n) > text {
+        transform: translateY(10px);
+    }
+    .axis {
+        font-size: 15px;
+    }
+
+    div.tooltip {
+        font-size: 17px;
+    }
+}
+body{
+    font-family: 'Rubik', sans-serif;
+}
+.hidden{
+    display: none;
+    opacity: 0;
+}
+#main{
+    margin: auto;
+    display: block;
+    border: 3px solid rgba(0,0,0,0.1);
+    border-radius: 10px;
+    background: whitesmoke;
+}
+#wrapper{
+    width: 98%;
+    min-height: 90vh;
+    margin: 0 auto;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 25% 50% 25%;
+    border-radius: 15px;
+    flex-direction: row-reverse;
+    justify-content: space-around;
+    align-items: flex-start;
+    background: mediumseagreen;
+}
+.side-bar{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.zoomButton > input{
+    background: none;
+    outline: none;
+    border: none;
+    color: white;
+    padding: 0;
+}
+.zoomButton > input::-webkit-input-placeholder{
+    color: white;
+}
+.zoomButton > input:-ms-input-placeholder{
+    color: white;
+}
+.zoomButton > input::placeholder{
+    color: white;
+}
+.option-tile{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: white;
+    border-radius: 2px;
+    margin: 5px;
+    padding: 5px;
+    width: 90%;
+}
+.option-tile > h1 {
+    border-bottom: 2px solid grey;
+    width: 90%;
+}
+.option-tile > button{
+    width: 90%;
+    text-align: center;
+    margin: 5px 0;
+    display: flex;
+    justify-items: center;
+    align-items: center;
+    flex-direction: row;
+ }
+.option-tile > button > i{
+    margin-right: 2px;
+}
+
+button{
+    padding: 8px 16px;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1;
+    color: white;
+    background-color: #1e90ff;
+    border: none;
+    outline: none;
+    overflow: hidden;
+    cursor: pointer;
+    filter: drop-shadow(0 2px 8px rgba(30, 144, 255, 0.32));
+    border-radius: 24px;
+    transition: all 0.5s ease;
+}
+button:hover:enabled{
+    font-size: 15px;
+    padding: 9px 17px;
+}
+button:disabled{
+    background-color: #777777;
+    color: #d0cfcf;
+    filter: drop-shadow(0 2px 8px rgba(119, 119, 119, 0.32));
+    cursor: default;
+}
+button.success{
+    background-color: #2ecc40;
+    filter: drop-shadow(0 2px 8px rgba(28, 103, 43, 0.32));
+}
+button.danger{
+    background-color: #ff4136;
+    filter: drop-shadow(0 2px 8px rgba(150, 48, 42, 0.32));
+}
+
+.zoomButton.deleteMode{
+    animation: shake 1s cubic-bezier(.36, .07, .19, .97) both infinite;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+.zoomButton.deleteMode:hover{
+    animation: shake 0s;
+}
+#plotTile{
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+@keyframes shake {
+    10%, 90% {
+        transform: translate3d(-1px, 0, 0);
+    }
+
+    20%, 80% {
+        transform: translate3d(2px, 0, 0);
+    }
+
+    30%, 50%, 70% {
+        transform: translate3d(-3px, 0, 0);
+    }
+
+    40%, 60% {
+        transform: translate3d(3px, 0, 0);
+    }
+}
+@media only screen and (min-width: 800px) {
+    button{
+        font-size: 14px;
+        padding: 12px 24px;
+    }
+    button:hover:enabled{
+        font-size: 16px;
+        padding: 11px 23px;
+    }
+}
+@media only screen and (min-width: 1050px) {
+    button{
+        font-size: 16px;
+        padding: 14px 28px;
+    }
+    button:hover:enabled{
+        font-size: 18px;
+        padding: 13px 27px;
+    }
+}
+@media only screen and (min-width: 1500px) {
+}
+@media only screen and (min-width: 1800px) {
+
+}

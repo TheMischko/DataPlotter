@@ -9,12 +9,7 @@ const View = mongoose.model('Views', viewSchema);
 const getViews = () => {
   return new Promise(((resolve, reject) => {
     View.find((err, views) => {
-      if(err) {
-        reject(err);
-      }
-      else {
-        resolve(views);
-      }
+      resolve(views);
     });
   }));
 };
@@ -26,9 +21,12 @@ const getViews = () => {
  */
 const getViewByID = (viewID) => {
   return new Promise(((resolve, reject) => {
+    if(viewID == null) reject("Wrong ID set");
     View.findOne({_id: viewID},(err, view) => {
-      if(err)
+      if(err) {
         reject(err);
+        return;
+      }
       resolve(view);
     });
   }));
@@ -41,9 +39,12 @@ const getViewByID = (viewID) => {
  */
 const getAllViewsForFile = (fileID) => {
   return new Promise(((resolve, reject) => {
+    if(fileID == null) {
+      reject("Wrong ID set");
+      return;
+    }
     View.find({fileID: fileID},(err, views) => {
-      if(err)
-        reject(err);
+      if(err) resolve([]);
       resolve(views);
     });
   }));
@@ -58,6 +59,10 @@ const getAllViewsForFile = (fileID) => {
  */
 const addView = (title, fileID, plotSettings) => {
   return new Promise(((resolve, reject) => {
+    if(title == null || fileID == null || plotSettings == null) {
+      reject("Wrong arguments set.");
+      return;
+    }
     const view = new View({
       title: title,
       fileID: fileID,
@@ -82,6 +87,10 @@ const addView = (title, fileID, plotSettings) => {
  */
 const deleteView = (viewID) => {
   return new Promise(((resolve, reject) => {
+    if(viewID == null) {
+      reject("Wrong ID set");
+      return;
+    }
     View.findOneAndDelete({_id: viewID}).then(
       () => { resolve() },
       () => { reject('Couldnt delete view with this ID.') })
@@ -94,8 +103,12 @@ const deleteView = (viewID) => {
  * @param changes Object - has to contain attributes with same names as database records
  * @returns {Promise<String>} - Resolve on success, reject in message on error
  */
-const editView = (viewID, changes) => {
+const editView = (viewID, changes = {}) => {
   return new Promise(((resolve, reject) => {
+    if(viewID == null) {
+      reject("Wrong ID set");
+      return;
+    }
     View.findByIdAndUpdate(viewID, changes, {runValidators: true}, (err, view) => {
       if(err)
         reject(err);

@@ -14,6 +14,8 @@ export default class ViewMakerPage extends IModalPage {
     this.jobDone = true;
     this.plotSettings = null;
     this.isEditing = false;
+    this.options = null;
+    this.functions = null;
   }
 
   async init(){
@@ -37,7 +39,7 @@ export default class ViewMakerPage extends IModalPage {
     this.getFunctionsHTML().then((functions) => {
       this.functions = functions;
     });
-
+    this.plots = 0;
     if(typeof alreadyKnownView !== "undefined" && alreadyKnownView !== null){
       if(typeof isEditView !== "undefined" && isEditView === true){
         this.viewID = alreadyKnownView;
@@ -83,13 +85,16 @@ export default class ViewMakerPage extends IModalPage {
    * @return {Promise<void>}
    */
   async appendNewPlotEditor() {
-    const root = d3.select('#viewMakerPage #plotSettings');
-    root.append('div')
-      .classed('setting', true)
-      .attr('plot', this.plots)
-      .html(`
+    if(this.options === null || this.functions === null){
+      setTimeout(() => {this.appendNewPlotEditor()}, 100);
+    } else {
+      const root = d3.select('#viewMakerPage #plotSettings');
+      root.append('div')
+        .classed('setting', true)
+        .attr('plot', this.plots)
+        .html(`
         <button class="delete-button"><i class="fas fa-times"></i></button>
-        <h2>Plot ${this.plots+1}</h2>
+        <h2>Plot ${this.plots + 1}</h2>
         <form>
             <div class="row">
                 <label>Main X axis:</label>
@@ -121,11 +126,16 @@ export default class ViewMakerPage extends IModalPage {
         .attr('style', "margin: 0 auto; display: block")
         .classed('danger', true).classed('add_new_value_button', true)
         .text('Add new values to this plot')
-        .on('click', (e) => { this.addNewValuesButtonClicked(e); });
+        .on('click', (e) => {
+          this.addNewValuesButtonClicked(e);
+        });
 
       jQuery('.select2').select2();
-      d3.selectAll(`.delete-button`).on('click', (e) => {console.log(this.returnValue())});
+      d3.selectAll(`.delete-button`).on('click', (e) => {
+
+      });
       this.plots++;
+    }
   }
 
   /**
@@ -136,9 +146,11 @@ export default class ViewMakerPage extends IModalPage {
   getOptionsHTML() {
     return new Promise(((resolve, reject) => {
       const fileID = this.modal.data.file;
-      console.log("FileID: "+fileID);
-      if(typeof fileID === "undefined")
-        reject()
+      if(typeof fileID === "undefined"){
+        reject();
+        return;
+      }
+
 
       const SERVER_URL = localStorage.getItem('SERVER_URL');
       $.ajax({
@@ -153,7 +165,9 @@ export default class ViewMakerPage extends IModalPage {
           resolve(html);
         },
         error: (res) => {
+          notify("Couldn't fetch headers correctly.", {type: "danger"});
           reject(JSON.parse(res));
+          console.error(res);
         }
       })
     }));
@@ -177,6 +191,10 @@ export default class ViewMakerPage extends IModalPage {
             html += `<option value="${option}">${option}</option>`
           })
           resolve(html);
+        },
+        error: (res) => {
+          notify("Couldn't fetch functions correctly.", {type: "danger"});
+          console.error(res);
         }
       })
 
@@ -228,8 +246,6 @@ export default class ViewMakerPage extends IModalPage {
     if(this.settings === "")
       return
     const settings = this.settings;
-    console.log(settings);
-    console.log(d3.select("#plotName"));
     d3.select("#plotName").node().value = settings.title;
     for(let i = 0; i < settings.plotSettings.length-1; i++){
       await this.appendNewPlotEditor();
@@ -264,8 +280,11 @@ export default class ViewMakerPage extends IModalPage {
    */
   getViewDataFromServer() {
     return new Promise(((resolve, reject)=> {
-      if(typeof this.viewID === "undefined" || this.viewID === "")
-        reject("No viewID is set.")
+      if(typeof this.viewID === "undefined" || this.viewID === ""){
+        reject("No viewID is set.");
+        return;
+      }
+
 
       const SERVER_URL = localStorage.getItem('SERVER_URL');
       $.ajax({
@@ -276,6 +295,7 @@ export default class ViewMakerPage extends IModalPage {
           resolve();
         },
         error: (res) => {
+          notify("Couldn't fetch view data from server.", {type: "danger"});
           console.error("Couldn't fetch view data from server.")
           console.error(res);
           reject(res)
@@ -339,6 +359,7 @@ export default class ViewMakerPage extends IModalPage {
               viewID: viewID
             },
             success: (res) => {
+              notify("View has been saved successfully.", {type: "success"});
               this.viewID = res;
               resolve([{
                 key: "view",
@@ -346,6 +367,8 @@ export default class ViewMakerPage extends IModalPage {
               }]);
             },
             error: (res) => {
+              notify("Couldn't save changes to view.", {type: "danger"});
+              console.error(res);
               reject(res);
             }
           });
@@ -372,6 +395,7 @@ export default class ViewMakerPage extends IModalPage {
             plotSettings: JSON.stringify(data)
           },
           success: (res) => {
+            notify("New View was created successfully.", {type: "success"});
             this.viewID = res;
             resolve([{
               key: "view",
@@ -379,6 +403,8 @@ export default class ViewMakerPage extends IModalPage {
             }]);
           },
           error: (res) => {
+            notify("Couldn't create new view on server.", {type: "danger"});
+            console.error(res);
             reject(res);
           }
         })

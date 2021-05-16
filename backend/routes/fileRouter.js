@@ -18,7 +18,8 @@ router.get('/', ((req, res) => {
         res.status(200).send(JSON.stringify(files))
       },
       (err) => {
-        res.status(400).send(err)
+        res.setHeader('content-type', 'text/plain');
+        res.status(400).send(err);
       });
   } else {
     fileModel.getFileByID(id).then(
@@ -48,8 +49,9 @@ router.post('/upload', function(req, res, next) {
       (fileId) => {
         res.status(200).send(JSON.stringify({id: fileId}));
       },
-      () => {
-        res.status(400).send(JSON.stringify('Wrong file provided.'));
+      (err) => {
+        res.setHeader('content-type', 'text/plain');
+        res.status(400).send(err);
       });
   }
 });
@@ -62,23 +64,25 @@ router.post('/upload', function(req, res, next) {
 router.post('/delete', ((req, res) => {
   const fileID = req.body.fileID;
   if(typeof fileID === "undefined" || fileID === "")
-    res.status("400").send("Bad file ID.");
+    res.status(400).send("Bad file ID.");
   fileModel.deleteFile(fileID).then(
     async () => {
-      const views = await viewModel.getAllViewsForFile(fileID);
-      if(typeof views === "string")
-        res.status(400).send(views);
-      for (const view of views) {
-        const result =  await viewModel.deleteView(view._id);
-        if(result)
-          continue;
-        const zooms = await zoomModel.getZoomsForView(view._id);
-        for (const zoom of zooms) {
-          await zoomModel.deleteZoom(zoom._id);
+      try{
+        const views = await viewModel.getAllViewsForFile(fileID);
+        for (const view of views) {
+          const result =  await viewModel.deleteView(view._id);
+          if(result)
+            continue;
+          const zooms = await zoomModel.getZoomsForView(view._id);
+          for (const zoom of zooms) {
+            await zoomModel.deleteZoom(zoom._id);
+          }
         }
+        res.status(200).send('Deleted');
+      } catch (err){
+        res.status(400).send(err);
       }
-      res.status(200).send('Deleted');
-      },
+     },
     (err) => { res.status(400).send(err); }
   )
 }));

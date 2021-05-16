@@ -9,7 +9,7 @@ const $ = require('jquery-ajax');
 const zoomManager = new ZoomManager();
 const plotManager = new PlotManager('plots', zoomManager);
 
-const SERVER_URL = 'http://localhost:3000'
+const SERVER_URL = 'http://localhost:3000';
 localStorage.setItem('SERVER_URL', SERVER_URL);
 
 // Appends Javascript objects to certain HTML element.

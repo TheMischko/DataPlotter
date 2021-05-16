@@ -21,13 +21,17 @@ const scales =
  * @returns {Promise<String[]>} Names in list
  */
 const getHeaders = (filename) => {
-  return new Promise(((resolve) => {
-    fs.createReadStream(csv_dir+filename)
-      .pipe(csv())
-      .on('headers', (headers) => {
-        const outHeaders = [...Object.keys(scales), ...headers]
-        resolve(outHeaders);
-      })
+  return new Promise(((resolve, reject) => {
+    if(filename == null) reject("Can't get headers for file with null filename.");
+    fs.access(csv_dir+filename, fs.constants.R_OK, (err => {
+      if(err) {reject("Can't access the file to get headers."); return;}
+      fs.createReadStream(csv_dir+filename)
+        .pipe(csv())
+        .on('headers', (headers) => {
+          const outHeaders = [...Object.keys(scales), ...headers]
+          resolve(outHeaders);
+        })
+    }))
   }))
 };
 
@@ -40,24 +44,31 @@ const getHeaders = (filename) => {
  * @return {Promise<{}[]>} Returns array of objects that contains number values under properties x and y.
  */
 const getValueTuples = (filename, xValue, yValue) => {
+  if (filename == null || xValue == null || yValue == null) return undefined;
   const values = [];
   let i = 0;
   return new Promise(((resolve, reject) => {
-    fs.createReadStream(csv_dir + filename)
-      .pipe(csv())
-      .on('data', (data) => {
-        Object.keys(scales).forEach((scale) => {
-          data[scale] = scales[scale](i);
-        })
-        i++;
-        if(typeof data[xValue] === 'undefined' && typeof data[yValue] === 'undefined')
-          reject();
-        values.push({x: Number(data[xValue]), y: Number(data[yValue])});
+    try {
+      fs.createReadStream(csv_dir + filename)
+        .pipe(csv())
+        .on('data', (data) => {
+          Object.keys(scales).forEach((scale) => {
+            data[scale] = scales[scale](i);
+          })
+          i++;
+          if (typeof data[xValue] === 'undefined' && typeof data[yValue] === 'undefined'){
+            reject();
+            return;
+          }
+          values.push({x: Number(data[xValue]), y: Number(data[yValue])});
 
-      })
-      .on('end', () => {
-        resolve(values);
-      })
+        })
+        .on('end', () => {
+          resolve(values);
+        })
+    } catch(err) {
+      reject(err);
+    }
   }))
 }
 

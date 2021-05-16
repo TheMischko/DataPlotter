@@ -11,6 +11,10 @@ const Zoom = mongoose.model('Zooms', zoomSchema);
  */
 const addZoom = (title, sequence, viewID) => {
   return new Promise(((resolve, reject) => {
+    if(title == null || sequence == null || viewID == null) {
+      reject();
+      return;
+    }
     let zoom = new Zoom({
       title: title,
       zoomSequence: sequence,
@@ -19,12 +23,10 @@ const addZoom = (title, sequence, viewID) => {
     zoom.validate().then(
       () => {
         zoom.save().then(zoom => {
-          console.log('Saved');
           resolve(zoom);
         })
       },
       () => {
-        console.log('Rejected');
         reject();
       }
     )
@@ -38,6 +40,7 @@ const addZoom = (title, sequence, viewID) => {
  */
 const deleteZoom = (zoomID) => {
   return new Promise(((resolve, reject) => {
+    if(zoomID == null) reject("Wrong ID set");
     Zoom.findOneAndDelete({_id: zoomID}, (err) => {
       if(err)
         reject(err);
@@ -49,16 +52,18 @@ const deleteZoom = (zoomID) => {
 
 /**
  * Returns all zooms for parent view.
- * @param viewID Number - ID of parent view for this zoom. Relation is Zoom N:1 View
+ * @param viewID String - ID of parent view for this zoom. Relation is Zoom N:1 View
  * @returns {Promise<Object[]>}
  */
 const getZoomsForView = (viewID) => {
   return new Promise(((resolve, reject) => {
+    if(viewID == null) reject("Wrong ID set");
     Zoom.find({viewID: viewID}, (err, zooms) => {
-      if(err)
-        reject(err)
-      else
-        resolve(zooms)
+      if(err) {
+        reject(err);
+        return;
+      }
+      resolve(zooms)
     })
   }));
 }
@@ -68,10 +73,11 @@ const getZoomsForView = (viewID) => {
  * @param zoomID {String} ID of zoom that has to change
  * @param changes {{}} object containing changes
  * Keys has to be names of the properties in database and values has to be new values.
- * @return {Promise<unknown>}
+ * @return {Promise<Object>}
  */
-const updateZoom = (zoomID, changes) => {
+const updateZoom = (zoomID, changes= {}) => {
   return new Promise(((resolve, reject) => {
+    if(zoomID == null) reject("Wrong ID set");
     Zoom.findByIdAndUpdate(zoomID, changes, {runValidators: true}, (err, zoom) => {
       if(err)
         reject(err);

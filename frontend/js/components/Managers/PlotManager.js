@@ -75,6 +75,7 @@ export default class PlotManager {
    * @param data {*}[] - contains values: String color, String function, {*}[] values, String xColumn, String yColumn
    */
   createPlot(data){
+    if(data == null) return;
     const id = 'plot-'+this.numOfPlots;
     const classed = 'plot';
     d3.select(this.wrapperElement).append('svg')

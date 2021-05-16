@@ -37,6 +37,7 @@ const functions = {
  * @return {[]} Array of values that are objects containing values x and y as properties.
  */
 const simple_moving_average = (values, a) => {
+  if (values == null || a == null) return undefined;
   let values_new = [];
   for(let i = 0; i < values.length; i++){
     let n = 0;
@@ -65,6 +66,7 @@ const simple_moving_average = (values, a) => {
  * @return {[]} Array of values that are objects containing values x and y as properties.
  */
 const multiplyValues = (values, multiplicator) => {
+  if (values == null || multiplicator == null) return undefined;
   let values_new = [];
   for(let i = 0; i < values.length; i++)
     values_new.push({x: values[i].x, y: values[i].y*multiplicator});

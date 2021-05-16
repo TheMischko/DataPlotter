@@ -30,7 +30,6 @@ export default class SettingsModal extends Modal{
         this.selector = selector;
         this.activePage = 0
         this.data = {};
-        this.zoomManager = options.zoomManager;
         this.init();
     }
 
@@ -208,7 +207,8 @@ export default class SettingsModal extends Modal{
         return new Promise(((resolve, reject) => {
             const viewID = this.data.view;
             if(typeof viewID === "undefined" || viewID === ""){
-                reject()
+                reject();
+                return;
             }
             const SERVER_URL = localStorage.getItem("SERVER_URL");
             $.ajax({

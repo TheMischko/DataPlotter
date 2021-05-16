@@ -73,10 +73,12 @@ export default class ZoomManager {
         url:  SERVER_URL + '/zooms?viewID=' + viewID,
         method: 'GET',
         success: (res) => {
+          if(res.length === 0) resolve([]);
           const zooms = JSON.parse(res);
           resolve(zooms.map((zoom => {return new Zoom(zoom._id, zoom.title, zoom.zoomSequence)})));
         },
         error: (res) => {
+          notify("Couldn't load zooms from server.", {type: "danger"});
           reject(res);
         }
       })
@@ -102,6 +104,7 @@ export default class ZoomManager {
    * @param zooms {*}[] - Zoom object containing these keys: String id, String name, [Number][] zoomSequence
    */
   setLocalZooms(zooms){
+    if(zooms == null) return;
     localStorage.setItem(this.ZOOMS_KEY, JSON.stringify(zooms));
   }
 
@@ -113,6 +116,12 @@ export default class ZoomManager {
    */
   addNewZoom(zoomSequence, name = '') {
     return new Promise(((resolve, reject) => {
+      if(zoomSequence == null) {
+        notify("Couldn't save new zoom on server.", {type: "danger"});
+        reject("Wrong zoom sequence");
+        return;
+      }
+
       const SERVER_URL = localStorage.getItem('SERVER_URL');
       const viewID = localStorage.getItem('viewID');
       $.ajax({
@@ -130,6 +139,7 @@ export default class ZoomManager {
           resolve(JSON.parse(res));
         },
         error: (res) => {
+          notify("Couldn't save new zoom on server.", {type: "danger"});
           reject(res);
         }
       })
@@ -141,6 +151,8 @@ export default class ZoomManager {
    * @param zoom
    */
   saveZoomLocal(zoom) {
+    if(zoom == null) return;
+
     const zooms = JSON.parse(localStorage.getItem('zooms'));
     zooms.push(zoom);
     localStorage.setItem('zooms', JSON.stringify(zooms));
@@ -153,6 +165,7 @@ export default class ZoomManager {
    * @throws Error when zoom was not found
    */
   getZoomByID(id){
+    if(id == null) return null;
     const zooms = this.getAllZoomsLocal();
     for(let i = 0; i<zooms.length; i++){
       if(zooms[i].id === id)
@@ -163,12 +176,16 @@ export default class ZoomManager {
 
   /**
    * Updates data to zoom in storage set by ID.
-   * @param {number} id
+   * @param {string} id
    * @param {string} name
    * @param {*[]} zoomSequence
    */
   updateZoom(id, {name= '', zoomSequence= null}){
     return new Promise(((resolve, reject) => {
+      if(id == null) {
+        reject("Wrong ID set for zoom update.");
+        return;
+      }
       const SERVER_URL = localStorage.getItem('SERVER_URL');
       const viewID = localStorage.getItem('viewID');
       const data= {
@@ -199,6 +216,7 @@ export default class ZoomManager {
           resolve(parsedRes);
         },
         error: (res) => {
+          notify("Couldn't update zoom on server.", {type: "danger"});
           reject(res)
         }
       })
@@ -211,6 +229,10 @@ export default class ZoomManager {
    */
   deleteZoom(id){
     return new Promise(((resolve, reject) => {
+      if(id == null) {
+        reject("Wrong ID set for zoom delete.");
+        return;
+      }
       const SERVER_URL = localStorage.getItem('SERVER_URL');
       $.ajax({
         url: SERVER_URL + "/zooms/delete",
@@ -230,6 +252,7 @@ export default class ZoomManager {
           resolve(JSON.parse(res));
         },
         error: (res) => {
+          notify("Couldn't delete zoom.", {type: "danger"});
           reject(res);
         }
       })
@@ -243,7 +266,6 @@ export default class ZoomManager {
    */
   saveCurrentZoom() {
     return new Promise(((resolve, reject) => {
-
       const zoomPath = this.getCurrentZoomPath();
       this.addNewZoom(zoomPath).then((zoom) => {
         resolve(zoom)

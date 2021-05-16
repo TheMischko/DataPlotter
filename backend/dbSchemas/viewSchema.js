@@ -10,7 +10,7 @@ const courseValuesSchema = new Schema({
   yColumn:  { type: String},
   func:     { type: String},
   color:    { type: String}
-})
+});
 
 /**
  * Mongoose schema for plot settings object that is part of viewSchema.

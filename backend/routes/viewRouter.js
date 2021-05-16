@@ -66,11 +66,15 @@ router.post('/delete', ((req, res) => {
 
   viewModel.deleteView(id).then(
     async () => {
-      const zooms = await zoomModel.getZoomsForView(id);
-      zooms.forEach((zoom) => {
-        zoomModel.deleteZoom(zoom._id);
-      });
-      res.status(200).send('Deleted')
+      try {
+        const zooms = await zoomModel.getZoomsForView(id);
+        zooms.forEach((zoom) => {
+          zoomModel.deleteZoom(zoom._id);
+        });
+        res.status(200).send('Deleted')
+      } catch (ex) {
+        res.status(400).send(ex.message)
+      }
     },
     (err) => { res.status(400).send(err)  }
   );
