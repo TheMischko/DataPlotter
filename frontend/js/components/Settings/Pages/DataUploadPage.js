@@ -142,6 +142,12 @@ export default class DataUploadPage extends IModalPage{
         const SERVER_URL = localStorage.getItem("SERVER_URL");
         const fd = new FormData();
         fd.append('file', file);
+        d3.select(".fileUpload-box")
+          .append("i")
+          .attr("id", "spinner")
+          .classed("fas", true)
+          .classed("fa-spinner", true)
+          .classed("fa-spin", true);
         $.ajax({
             url: SERVER_URL + '/files/upload',
             method: 'POST',
@@ -153,6 +159,7 @@ export default class DataUploadPage extends IModalPage{
                 req.setRequestHeader('Access-Control-Allow-Credentials', 'true')
             },
             success: (res) => {
+                d3.select("#spinner").remove();
                 const response = JSON.parse(res)
 
                 const infoDiv = d3.select('.fileUpload-success').html('Uploaded:');
@@ -167,6 +174,7 @@ export default class DataUploadPage extends IModalPage{
                 notify("File was successfully uploaded, you can continue to the next page.", {type: "success"});
             },
             error: (res) => {
+                d3.select("#spinner").remove();
                 error.classed('show', true);
                 d3.select('#fileNameRow').classed("hidden", true);
                 error.text(error.text().replace('.', res.responseText));

@@ -87,7 +87,14 @@ export default class FileSelectPagePage extends IModalPage{
    * Calls API for files in database and draw them into the modal window.
    */
   drawFiles() {
+    d3.select("#fileSelectPage > .tiles")
+      .append("i")
+      .attr("id", "spinner")
+      .classed("fas", true)
+      .classed("fa-spinner", true)
+      .classed("fa-spin", true);
     this.getFiles().then((files) => {
+      d3.select("#spinner").remove();
       if(files.length === 0){
         d3.select('#fileSelectPage .tiles')
           .append('div')

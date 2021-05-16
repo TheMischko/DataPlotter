@@ -88,7 +88,21 @@ export default class ViewSelectPage extends IModalPage{
    * Calls API for views for file set by pages before in database and draw them into the modal window.
    */
   drawViews() {
+    d3.select("#viewWrapper .tiles")
+      .append("i")
+      .attr("id", "spinner")
+      .classed("fas", true)
+      .classed("fa-spinner", true)
+      .classed("fa-spin", true);
     this.getViews().then((views) => {
+      d3.select("#spinner").remove();
+      if(views.length === 0){
+        d3.select('#viewWrapper .tiles')
+          .append('div')
+          .attr("style", "color: grey; margin: 20px;")
+          .text("There are currently no views for this file.")
+        return;
+      }
       views.forEach((view) => {
         let viewName = view.title.length > 40 ? view.title.substring(0, 39)+"…" : view.title
         d3.select('#viewWrapper .tiles')
