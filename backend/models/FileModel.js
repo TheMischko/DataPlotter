@@ -17,9 +17,20 @@ const saveCSV = (inFile) => {
       reject("Value of inFile is null");
       return;
     }
-    const csvMime = process.env.CSV_MIMETYPE;
+    const csvMimeTypesString = process.env.CSV_MIMETYPE;
 
-    if(inFile.mimetype !== csvMime) {
+    const csvMimeTypes = csvMimeTypesString.split(', ');
+
+    
+    let isValidMimetype = false;
+
+    csvMimeTypes.forEach((minetype) => {
+      if(inFile.mimetype === minetype) {
+        isValidMimetype = true;
+      }
+    });
+
+    if(!isValidMimetype){
       reject("File is not type of CSV.");
       return;
     }
